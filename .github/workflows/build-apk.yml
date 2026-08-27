@@ -1,10 +1,9 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,22 +17,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dependencies
         run: npm install
 
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android
+
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Sync Capacitor
+      - name: Sync app
         run: npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Build APK
         run: |
