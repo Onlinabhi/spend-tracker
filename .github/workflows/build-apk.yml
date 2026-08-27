@@ -22,6 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp manifest.webmanifest www/
+          cp sw.js www/
+          cp icon-192.svg www/
+          cp icon-512.svg www/
+
       - name: Check Capacitor
         run: npx cap --version
 
