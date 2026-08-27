@@ -1,9 +1,10 @@
 name: Build Android APK
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -16,18 +17,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android
+      - name: Check Capacitor
+        run: npx cap --version
 
-      - name: Add Android platform
+      - name: Create Android project
         run: npx cap add android
 
-      - name: Sync app
+      - name: Sync web app
         run: npx cap sync android
 
       - name: Setup Java
@@ -37,13 +38,13 @@ jobs:
           java-version: 21
 
       - name: Build APK
+        working-directory: android
         run: |
-          cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: spend-tracker-apk
+          name: spend-tracker-v20-2
           path: android/app/build/outputs/apk/debug/app-debug.apk
