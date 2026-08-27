@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#18202d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="application-name" content="Spend Tracker v20">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Spend Tracker">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<title>Spend Tracker v20</title>
+<style>
+:root{
+--bg:#f4f6f8;--surface:#fff;--surface2:#f8fafc;--text:#182230;--muted:#687586;--line:#e2e7ee;
+--money:#ef6c3b;--money2:#f59e0b;--money-bg:#fff4ee;--money-green:#07844d;--money-red:#c4322b;
+--wealth:#5665d9;--wealth2:#21a6a8;--wealth-bg:#f0f2ff;--wealth-gold:#b47a22;--wealth-purple:#7d58c9;
+--nav:#fffffff0;--shadow:0 12px 30px rgba(24,34,48,.08)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:radial-gradient(circle at 15% 18%,rgba(239,108,59,.06) 0 2px,transparent 2.5px),radial-gradient(circle at 83% 76%,rgba(86,101,217,.06) 0 2px,transparent 2.5px);background-size:42px 42px,58px 58px}
+button,input,select{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:800px;margin:auto;padding:20px 18px calc(122px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center}.brand h1{margin:0;font-size:29px;font-weight:880;letter-spacing:-.8px}.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.theme{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:19px;font-weight:850}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface2);border:1px solid var(--line);border-radius:16px;margin-top:15px}.mode button{border:0;background:transparent;border-radius:12px;padding:11px;font-weight:850;color:var(--muted)}.mode button.money-active{background:var(--money);color:#fff;box-shadow:0 4px 12px #ef6c3b33}.mode button.wealth-active{background:var(--wealth);color:#fff;box-shadow:0 4px 12px #5665d933}
+.screen{display:none}.screen.active{display:block}
+.money-page{--page-accent:var(--money)}.wealth-page{--page-accent:var(--wealth)}
+.monthpick{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:12px}.monthpick button{width:35px;height:35px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.monthpick span{min-width:142px;text-align:center;font-size:13px;font-weight:820}
+.hero{margin-top:14px;padding:22px;border-radius:24px;color:#fff;box-shadow:var(--shadow);overflow:hidden;position:relative}.money-hero{background:linear-gradient(145deg,#24313f,#49596c)}.wealth-hero{background:linear-gradient(145deg,#4250b8,#167f83)}.hero:after{content:"";position:absolute;right:-55px;top:-70px;width:190px;height:190px;border-radius:50%;background:#ffffff12}.hero small{color:#dbe1e8;position:relative;z-index:1}.hero-total{font-size:40px;line-height:1;font-weight:900;letter-spacing:-1px;margin:7px 0 18px;position:relative;z-index:1}.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;z-index:1}.hero-stat{background:#ffffff10;border:1px solid #ffffff15;border-radius:14px;padding:10px}.hero-stat span{display:block;font-size:11px;color:#d6dde5}.hero-stat b{display:block;margin-top:3px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:11px}.quick-card{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:12px 9px}.quick-card b{display:block;font-size:15px}.quick-card span{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.section{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 10px}.section h2{font-size:18px;margin:0}.section button{border:0;background:transparent;color:var(--muted);font-weight:800}.small{font-size:12px;color:var(--muted)}
+.card,.tx,.asset,.debt{background:var(--surface);border:1px solid var(--line);border-radius:19px}.card{padding:16px}
+.range-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.selectish{border:1px solid var(--line);background:var(--surface2);border-radius:11px;padding:8px 10px;font-size:12px;font-weight:800}
+.bars{height:130px;display:flex;align-items:end;gap:7px;margin-top:14px}.barcol{flex:1;text-align:center;min-width:0}.bar{width:100%;min-height:6px;border-radius:8px 8px 3px 3px;background:#dce3ea}.bar.cool{background:#8ea8c5}.bar.warm{background:linear-gradient(#f59e0b,#ef6c3b)}.barlabel{font-size:10px;color:var(--muted);margin-top:6px}
+.tx{display:flex;align-items:center;gap:10px;padding:13px;margin:8px 0;border-left:4px solid #98a2b3}.tx-date{font-size:10px;color:var(--muted);margin-top:4px}.tx-menu{width:38px;height:38px;flex:0 0 38px;border:1px solid var(--line);background:var(--surface2);border-radius:12px;font-weight:900;font-size:18px}.tx-menu:active{transform:scale(.96)}.tx-icon{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;font-size:20px}.tx-info{flex:1;min-width:0}.tx-title{font-weight:790;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tx-meta{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tx-amount{font-weight:870;white-space:nowrap}.positive{color:var(--money-green)}.tx-transfer{color:#2563a8}
+.search{width:100%;min-height:48px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 13px;outline:none}.filters{display:flex;gap:7px;overflow:auto;padding:9px 0 2px}.filters button{white-space:nowrap;border:1px solid var(--line);background:var(--surface);padding:8px 10px;border-radius:999px;font-size:11px}.filters button.active{background:var(--accent);color:#fff}
+.progress{height:9px;background:#e8edf2;border-radius:99px;overflow:hidden}.progress i{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444)}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}.metric{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:15px}.metric b{display:block;font-size:20px;margin-top:4px}
+.mix{display:flex;height:13px;border-radius:99px;overflow:hidden;background:#e8edf2}.piece{height:100%}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px}.legend div{font-size:11px;display:flex;align-items:center;gap:7px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.asset{padding:15px;margin:9px 0}.asset-head{display:flex;justify-content:space-between;gap:10px}.asset-name{font-weight:840}.asset-value{font-weight:900;font-size:20px;white-space:nowrap}.asset-sub{font-size:11px;color:var(--muted);margin-top:4px}.actions{display:flex;gap:7px;margin-top:10px}.mini{border:0;background:var(--surface2);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:760}.mini.danger{color:var(--money-red);background:#fff0ee}
+.debt{padding:15px;margin:9px 0;border-left:5px solid var(--money)}.debt-head{display:flex;justify-content:space-between;gap:10px}.debt-person{font-weight:840}.debt-amount{font-size:21px;font-weight:900}.lend{color:var(--money-green)}.borrow{color:var(--money-red)}.status{font-size:10px;font-weight:820;padding:5px 8px;border-radius:999px;background:#fff7dc;color:#9a6d13}
+.empty{text-align:center;color:var(--muted);padding:28px 10px;border:1px dashed var(--line);border-radius:17px}
+.fab{position:fixed;z-index:10;right:max(18px,calc((100vw - 800px)/2 + 18px));bottom:calc(76px + env(safe-area-inset-bottom));width:60px;height:60px;border:0;border-radius:20px;background:linear-gradient(145deg,#ef6c3b,#f59e0b);color:#fff;font-size:30px;box-shadow:0 13px 27px #18223033}.fab.wealth{background:linear-gradient(145deg,#5665d9,#21a6a8)}
+nav{position:fixed;z-index:9;left:0;right:0;bottom:0;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}.navinner{max-width:800px;margin:auto;display:flex;justify-content:space-around;padding:8px 3px}.navitem{border:0;background:transparent;color:var(--muted);font-size:10px;font-weight:760;padding:4px 8px}.navitem span{display:block;font-size:19px;line-height:20px;margin-bottom:3px}.navitem.money-selected{color:var(--money)}.navitem.wealth-selected{color:var(--wealth)}.navitem:focus-visible{outline:2px solid currentColor;outline-offset:2px}.wealth-page ~ nav .navitem.wealth-selected{font-weight:900}
+.modal{position:fixed;inset:0;background:#182230b0;display:none;align-items:flex-end;z-index:1000;overscroll-behavior:contain}.modal.show{display:flex}.sheet{width:min(800px,100%);max-height:95dvh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border-radius:27px 27px 0 0;padding:15px 18px calc(90px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px #18223033;position:relative;z-index:1001}.handle{width:38px;height:4px;background:#cfd6df;border-radius:99px;margin:0 auto 12px}.sheet-head{display:flex;align-items:center;justify-content:space-between}.sheet-head h2{margin:0;font-size:21px}.close{border:0;background:var(--surface2);width:38px;height:38px;border-radius:12px}
+label{display:block;font-size:12px;font-weight:820;margin:13px 0 6px}.req{color:var(--money-red)}input,select{width:100%;min-height:48px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--text);outline:none}.types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.types button{padding:11px;border:1px solid var(--line);background:var(--surface);border-radius:12px;font-weight:760}.types button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.savebar{display:flex;gap:8px;margin-top:16px}.savebar>*{flex:1}.primary{border:0;background:var(--accent);color:#fff;border-radius:14px;padding:14px;font-weight:840}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.action-card{text-align:left;padding:15px;border:1px solid var(--line);background:var(--surface);border-radius:17px}.action-card b{display:block;margin-top:6px}.action-card span{font-size:11px;color:var(--muted)}
+body.dark{--bg:#0b1118;--surface:#141b24;--surface2:#10161f;--text:#f2f4f7;--muted:#9ba6b4;--line:#293441;--nav:#141b24ef}
+body.dark .theme{background:#fff;color:#0b1118;border-color:#fff}body.dark .mode button.active{color:#fff}body.dark .mode button.money-active{background:#d65d31}body.dark .mode button.wealth-active{background:#5967dc}body.dark .money-hero{background:linear-gradient(145deg,#253340,#47586b)}body.dark .wealth-hero{background:linear-gradient(145deg,#4d5bd1,#168d90)}
+@media(max-width:560px){.quick{grid-template-columns:1fr 1fr}.hero-total,.worth{font-size:36px}.asset-grid{grid-template-columns:1fr}.fab{right:17px}}
+.manage-row{display:grid;grid-template-columns:1fr auto auto auto;gap:7px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.manage-row:last-child{border-bottom:0}.manage-row span{font-size:11px;color:var(--muted);text-align:right}body.dark .selectish,body.dark input,body.dark select,body.dark .secondary,body.dark .mini{background:#202936;color:#f2f4f7;border-color:#354150}body.dark .action-card{background:#151b24;color:#f2f4f7;border-color:#293441}body.dark .small,body.dark .asset-sub,body.dark .tx-meta{color:#aeb8c5}body.dark .empty{background:#151b24;border-color:#354150;color:#aeb8c5}
+/* V11 semantic theme fixes */
+:root{--primary-action:#182230;--primary-action-text:#fff;--money-nav:#e76335;--wealth-nav:#5967d9}
+body.dark{--primary-action:#eef2f6;--primary-action-text:#10161f}
+.primary{background:var(--primary-action);color:var(--primary-action-text)!important}
+.dark .primary{background:var(--primary-action);color:var(--primary-action-text)!important}
+.trend-card{padding-bottom:13px}.trend-summary{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.wealth-tool-card{background:linear-gradient(160deg,var(--surface),var(--wealth-bg,#f0f2ff))}
+.wealth-action{min-height:108px;transition:transform .15s ease,box-shadow .15s ease}.wealth-action:active{transform:scale(.98)}.wealth-action.fd{border-top:4px solid #e58b36}.wealth-action.mf{border-top:4px solid #315d87}.wealth-action.debt{border-top:4px solid #e16b67}.wealth-action.epfo{border-top:4px solid #1b9870}.wealth-action.loan{border-top:4px solid #d35e5e}.wealth-action.stock{border-top:4px solid #7957c7}.wealth-action.asset{border-top:4px solid #b47a22}
+.milestone{padding:13px;border:1px solid var(--line);border-radius:16px;background:var(--surface);margin-top:8px}.milestone-head{display:flex;justify-content:space-between;gap:8px}.milestone-title{font-weight:850}.milestone-amt{font-weight:900}.milestone-track{height:10px;border-radius:99px;background:#e9edf2;overflow:hidden;margin:9px 0 6px}.milestone-track i{display:block;height:100%;background:linear-gradient(90deg,#5665d9,#21a6a8);border-radius:99px}.milestone-foot{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}
+.wealth-return-card{background:linear-gradient(145deg,var(--surface),var(--surface2))}
+
+/* V11 visual system: Money and Wealth are deliberately different, but both remain readable in both themes. */
+:root{--wealth-surface:#f8f8ff;--wealth-card:#ffffff;--wealth-ink:#17213b;--wealth-muted:#66718a;--wealth-border:#dfe3f0;--wealth-a:#5665d9;--wealth-b:#21a6a8;--wealth-c:#8a63d2;--wealth-gold:#d38b2f}
+body.dark{--wealth-surface:#101728;--wealth-card:#151d2d;--wealth-ink:#f4f7ff;--wealth-muted:#aab5c9;--wealth-border:#2c3850}
+.wealth-page{background:transparent;color:var(--wealth-ink)}
+.wealth-page .wealth-hero{color:#fff!important;background:linear-gradient(135deg,#4b55c9 0%,#5665d9 45%,#18a4a5 100%);border:1px solid #ffffff18;box-shadow:0 16px 34px rgba(61,72,180,.18)}
+.wealth-page .wealth-hero small,.wealth-page .wealth-delta{color:#eef3ff!important}
+.wealth-page .metric{background:linear-gradient(145deg,var(--wealth-card),var(--wealth-surface));border-color:var(--wealth-border);box-shadow:0 7px 20px rgba(55,66,125,.06)}
+.wealth-page .metric:nth-child(1){border-top:3px solid #21a6a8}.wealth-page .metric:nth-child(2){border-top:3px solid #d35e5e}.wealth-page .metric:nth-child(3){border-top:3px solid #24a36b}.wealth-page .metric:nth-child(4){border-top:3px solid #e08a35}
+.wealth-page .card,.wealth-page .asset,.wealth-page .debt{background:var(--wealth-card);border-color:var(--wealth-border)}
+.wealth-page .section button{color:var(--wealth-a)}.wealth-page .wealth-link{border:0;background:transparent;color:var(--wealth-a);font-weight:850}
+.wealth-page .small,.wealth-page .asset-sub,.wealth-page .tx-meta{color:var(--wealth-muted)}
+.wealth-page .asset{box-shadow:0 6px 18px rgba(55,66,125,.05)}
+.wealth-page .wealth-tool-card{background:linear-gradient(150deg,#f3f4ff,#f7ffff)}
+body.dark .wealth-page .wealth-tool-card{background:linear-gradient(150deg,#171d35,#12262b)}
+.wealth-page .wealth-action{background:var(--wealth-card);color:var(--wealth-ink);border-color:var(--wealth-border);box-shadow:0 7px 16px rgba(55,66,125,.05)}
+body.dark .wealth-page .wealth-action{background:#151d2d}
+.wealth-page .wealth-action span{color:var(--wealth-muted)}
+.wealth-page .wealth-milestone-card{background:linear-gradient(150deg,#fffaf1,#f8f8ff)}
+body.dark .wealth-page .wealth-milestone-card{background:linear-gradient(150deg,#2a2418,#171d35)}
+.wealth-page .wealth-return-card{background:linear-gradient(135deg,#edf0ff,#e8fbfb);border-color:#d8def0}
+body.dark .wealth-page .wealth-return-card{background:linear-gradient(135deg,#1d2540,#123136);border-color:#33435b}
+.section button.primary,.section .primary{background:var(--primary-action)!important;color:var(--primary-action-text)!important;border:0}
+.primary{background:var(--primary-action);color:var(--primary-action-text)!important}
+.trend-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}.trend-toolbar>div:first-child{display:flex;flex-direction:column;gap:3px}.trend-toolbar b{font-size:25px;line-height:1}.trend-select{width:min(245px,58%);min-height:45px;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:13px;padding:10px 12px;font-size:12px;font-weight:850}
+.trend-summary{font-size:11px}.trend-summary strong{color:var(--text)}
+.goal-kpi{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--wealth-border)}.goal-kpi:last-child{border-bottom:0}.goal-kpi span{color:var(--wealth-muted);font-size:12px}.goal-kpi b{font-size:21px}
+.wealth-page .progress{background:#e7eaf2}.wealth-page .milestone-track{background:#e7eaf2}
+body.dark .wealth-page .progress,body.dark .wealth-page .milestone-track{background:#293449}
+body.dark .wealth-page .mini{background:#202a3b;color:#f4f7ff;border-color:#35445d}.wealth-page .mini{color:var(--wealth-ink)}
+
+
+/* V14 Wealth analytics redesign */
+.chart-head{display:flex;align-items:baseline;gap:8px;justify-content:flex-start}.chart-head b{font-size:28px;line-height:1.05}.wealth-pill{font-size:10px;font-weight:900;letter-spacing:.08em;padding:6px 9px;border-radius:999px;background:#e9edff;color:var(--wealth-a)}
+.wealth-kpi-card{padding:20px;border-radius:23px;background:linear-gradient(135deg,#5665d9,#21a6a8);color:#fff;box-shadow:0 14px 30px rgba(61,72,180,.2)}.wealth-kpi-label{font-size:13px;opacity:.86}.wealth-kpi-value{font-size:38px;font-weight:950;letter-spacing:-1.3px;margin:5px 0}.wealth-kpi-note{font-size:11px;opacity:.82}
+.wealth-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}.wealth-stat{position:relative;overflow:hidden;padding:15px;border:1px solid var(--wealth-border);border-radius:18px;background:var(--wealth-card);box-shadow:0 7px 18px rgba(55,66,125,.05)}.wealth-stat span{display:block;font-size:11px;color:var(--wealth-muted)}.wealth-stat b{display:block;font-size:20px;margin-top:5px;color:var(--wealth-ink)}.wealth-stat i{display:block;height:4px;border-radius:9px;margin-top:10px;background:linear-gradient(90deg,var(--wealth-a),var(--wealth-b))}.wealth-stat:nth-child(2) i{background:#d35e5e}.wealth-stat:nth-child(3) i{background:#24a36b}.wealth-stat:nth-child(4) i{background:#e08a35}
+.wealth-allocation-card,.wealth-breakdown-card{background:var(--wealth-card);border:1px solid var(--wealth-border);border-radius:21px;padding:16px;box-shadow:0 7px 18px rgba(55,66,125,.05)}.wealth-allocation-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--wealth-muted);font-size:12px}.wealth-allocation-head b{font-size:17px;color:var(--wealth-ink)}.wealth-alloc-row{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--wealth-border)}.wealth-alloc-row:last-child{border-bottom:0}.wealth-alloc-icon{width:36px;height:36px;border-radius:11px;background:var(--wealth-surface);display:grid;place-items:center;font-size:9px;font-weight:900;color:var(--wealth-a)}.wealth-alloc-main{flex:1;min-width:0}.wealth-alloc-top{display:flex;justify-content:space-between;gap:8px;align-items:center}.wealth-alloc-top b{font-size:12px;color:var(--wealth-ink)}.wealth-alloc-top span{font-size:10px;color:var(--wealth-muted);white-space:nowrap}.wealth-alloc-track{height:8px;background:#e8ebf2;border-radius:99px;overflow:hidden;margin-top:7px}.wealth-alloc-track i{display:block;height:100%;border-radius:99px}.wealth-break-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--wealth-border)}.wealth-break-row:last-child{border-bottom:0}.wealth-break-row b{display:block;font-size:12px;color:var(--wealth-ink)}.wealth-break-row span{display:block;font-size:10px;color:var(--wealth-muted);margin-top:2px}.wealth-break-row strong{font-size:16px;color:var(--wealth-ink)}
+/* Keep Wealth management accessible and visually distinct. */
+.wealth-page .wealth-tool-card{border:1px solid #cfd6f5;box-shadow:0 12px 28px rgba(86,101,217,.09)}.wealth-page .wealth-action{min-height:118px}.wealth-page .wealth-action b{font-size:14px}.wealth-page .wealth-action span{display:block;margin-top:4px}.wealth-page .wealth-return-card .primary{background:linear-gradient(135deg,#5665d9,#21a6a8)!important;color:#fff!important}
+nav{z-index:100}.fab{z-index:90}
+@media(max-width:560px){.wealth-kpi-value{font-size:34px}.wealth-alloc-top{align-items:flex-start;flex-direction:column;gap:2px}.wealth-stat b{font-size:18px}}
+
+/* V16 More/customization + recovery */
+body.text-small{font-size:0.94em}body.text-large{font-size:1.08em}
+.text-scale-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.text-scale-row button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px 8px;font-weight:800}.text-scale-row button.sel{background:var(--page-accent);color:#fff;border-color:var(--page-accent)}
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.more-action{border:1px solid var(--line);background:var(--surface2);border-radius:15px;padding:13px;text-align:left;font-weight:800}.more-action span{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}.backup-note{line-height:1.45}.profile-chip{font-weight:850;color:var(--page-accent)}
+.wealth-page .more-action{background:var(--wealth-card);border-color:var(--wealth-border);color:var(--wealth-ink)}
+@media(max-width:560px){.more-grid{grid-template-columns:1fr}.text-scale-row button{padding:11px 6px}}
+.install-app{display:none;position:fixed;right:16px;bottom:86px;z-index:20;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:14px;padding:10px 13px;font-weight:850;box-shadow:var(--shadow)}
+.install-app.show{display:block}
+
+.delete-btn{border:1px solid #e2b4b0!important;color:#b43d35!important;background:transparent!important}
+
+/* V15 stability/UI fixes */
+.wealth-analytics-screen{color:var(--wealth-ink)}
+.wealth-analytics-screen .wealth-kpi-card{display:block!important;min-height:132px!important;padding:20px!important;border-radius:23px!important;background:linear-gradient(135deg,#5665d9,#21a6a8)!important;color:#fff!important}
+.wealth-analytics-screen .wealth-kpi-value{display:block!important;font-size:38px!important;line-height:1.05!important;font-weight:950!important;margin:6px 0!important;color:#fff!important}
+.wealth-analytics-screen .wealth-kpi-label{display:block!important;font-size:13px!important;color:#eef3ff!important}
+.wealth-analytics-screen .wealth-kpi-note{display:block!important;color:#eef3ff!important}
+.wealth-analytics-screen .wealth-stat-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+.wealth-analytics-screen .wealth-stat{min-height:86px!important;display:block!important}
+.wealth-analytics-screen .wealth-alloc-top{display:flex!important}
+.wealth-analytics-screen .wealth-break-row{display:flex!important}
+@media(max-width:560px){.wealth-analytics-screen .wealth-kpi-value{font-size:34px!important}.wealth-analytics-screen .wealth-stat b{font-size:18px!important}}
+.more-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.more-card-head b{font-size:16px}.more-card-head span{font-size:11px;color:var(--muted)}
+.tx-action-list{display:grid;gap:9px;margin-top:12px}.tx-action-list button{text-align:left;padding:14px 15px;border:1px solid var(--line);background:var(--surface2);border-radius:14px;font-weight:800}.tx-action-list button.danger{color:var(--money-red)}
+
+/* V18.1 visual cleanup */
+.mode{background:var(--surface)!important;border-color:var(--line)!important}
+.mode button{background:transparent!important;color:var(--muted)!important;border:1px solid transparent!important;box-shadow:none!important}
+.mode button.money-active{background:var(--money)!important;color:#fff!important;border-color:var(--money)!important}
+.mode button.wealth-active{background:var(--wealth)!important;color:#fff!important;border-color:var(--wealth)!important}
+body.dark .mode{background:var(--surface2)!important}
+body.dark .mode button{color:var(--muted)!important}
+body.dark .mode button.money-active{background:#d65d31!important;color:#fff!important}
+body.dark .mode button.wealth-active{background:#5967dc!important;color:#fff!important}
+.profile-card{padding:18px}
+.profile-top{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.profile-avatar{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,var(--page-accent),var(--money2));color:#fff;font-size:20px;font-weight:900;flex:0 0 52px}
+.profile-title{font-size:19px;font-weight:900;line-height:1.1}.profile-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.profile-fields{display:grid;gap:10px}.profile-field label{margin:0 0 5px;font-size:11px}.profile-field input{min-height:46px}
+.profile-actions{display:flex;gap:8px;margin-top:12px}.profile-actions button{flex:1}
+.backup-status{margin-top:9px;font-size:11px;color:var(--muted)}
+body.dark .profile-avatar{background:linear-gradient(145deg,var(--page-accent),#f59e0b)}
+
+/* V19.03 personal edition */
+.brand{min-width:0}.brand h1{font-size:30px;letter-spacing:-1px}.brand p{font-size:13px}.global-message{margin-top:7px;font-size:13px;font-weight:760;line-height:1.25;color:var(--page-accent,var(--accent))}.settings-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}.settings-head h2{font-size:25px;margin:0}.dice-button{width:52px;height:52px;border:1px solid var(--line);background:var(--surface2);border-radius:17px;font-size:25px;box-shadow:0 6px 18px rgba(0,0,0,.08)}.identity-card{padding:16px}.identity-main{display:flex;align-items:center;gap:13px;margin-bottom:14px}.avatar-button{position:relative;padding:0;border:0;background:transparent}.avatar-button>span{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:15px;border:2px solid var(--surface)}.profile-avatar.large{width:62px;height:62px;border-radius:19px;font-size:23px;background:linear-gradient(145deg,var(--page-accent),var(--money2));background-size:cover;background-position:center}.identity-name{font-size:20px;font-weight:900}.identity-sub{font-size:12px;color:var(--muted);margin-top:3px}.primary.full{width:100%}.surprise-card{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.surprise-preview{margin-top:4px;color:var(--muted);font-size:12px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.settings-list-card{margin-top:12px;padding:0;overflow:hidden}.settings-list-card details{border-bottom:1px solid var(--line)}.settings-list-card details:last-child{border-bottom:0}.settings-list-card summary{list-style:none;cursor:pointer;padding:17px 16px;font-weight:850}.settings-list-card summary::-webkit-details-marker{display:none}.settings-list-card summary:after{content:'＋';float:right;color:var(--muted)}.settings-list-card details[open] summary:after{content:'−'}.settings-body{padding:0 16px 16px}.personal-options{display:grid;gap:10px;margin-top:12px}.personal-options label{margin:0;font-size:12px;font-weight:700}.personal-options input{width:auto;min-height:0}.danger-wide{width:100%;color:var(--money-red)!important}.profile-field input[type=file]{padding:9px}.wealth-page .global-message{color:var(--wealth)}.wealth-page .settings-list-card{background:var(--wealth-card);border-color:var(--wealth-border)}.wealth-page .dice-button{background:var(--wealth-surface);border-color:var(--wealth-border)}
+body.dark .settings-list-card{background:#141b24}.dark .danger-wide{background:#2a1b1d!important}.dark .surprise-card{background:#141b24}.dark .global-message{color:#ff9a72}.dark .wealth-page .global-message{color:#8f9aff}
+@media(max-width:560px){.brand h1{font-size:28px}.global-message{max-width:290px}.settings-head{margin-top:18px}}
+/* V19.03 personal edition */
+.brand{min-width:0}.brand h1{font-size:30px;letter-spacing:-1px}.brand p{font-size:13px}.global-message{margin-top:7px;font-size:13px;font-weight:760;line-height:1.25;color:var(--page-accent,var(--accent))}.settings-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px}.settings-head h2{font-size:25px;margin:0}.dice-button{width:52px;height:52px;border:1px solid var(--line);background:var(--surface2);border-radius:17px;font-size:25px;box-shadow:0 6px 18px rgba(0,0,0,.08)}.identity-card{padding:16px}.identity-main{display:flex;align-items:center;gap:13px;margin-bottom:14px}.avatar-button{position:relative;padding:0;border:0;background:transparent}.avatar-button>span{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:15px;border:2px solid var(--surface)}.profile-avatar.large{width:62px;height:62px;border-radius:19px;font-size:23px;background:linear-gradient(145deg,var(--page-accent),var(--money2));background-size:cover;background-position:center}.identity-name{font-size:20px;font-weight:900}.identity-sub{font-size:12px;color:var(--muted);margin-top:3px}.primary.full{width:100%}.surprise-card{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.surprise-preview{margin-top:4px;color:var(--muted);font-size:12px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.settings-list-card{margin-top:12px;padding:0;overflow:hidden}.settings-list-card details{border-bottom:1px solid var(--line)}.settings-list-card details:last-child{border-bottom:0}.settings-list-card summary{list-style:none;cursor:pointer;padding:17px 16px;font-weight:850}.settings-list-card summary::-webkit-details-marker{display:none}.settings-list-card summary:after{content:'＋';float:right;color:var(--muted)}.settings-list-card details[open] summary:after{content:'−'}.settings-body{padding:0 16px 16px}.personal-options{display:grid;gap:10px;margin-top:12px}.personal-options label{margin:0;font-size:12px;font-weight:700}.personal-options input{width:auto;min-height:0}.danger-wide{width:100%;color:var(--money-red)!important}.profile-field input[type=file]{padding:9px}.wealth-page .global-message{color:var(--wealth)}.wealth-page .settings-list-card{background:var(--wealth-card);border-color:var(--wealth-border)}.wealth-page .dice-button{background:var(--wealth-surface);border-color:var(--wealth-border)}
+body.dark .settings-list-card{background:#141b24}.dark .danger-wide{background:#2a1b1d!important}.dark .surprise-card{background:#141b24}.dark .global-message{color:#ff9a72}.dark .wealth-page .global-message{color:#8f9aff}
+@media(max-width:560px){.brand h1{font-size:28px}.global-message{max-width:290px}.settings-head{margin-top:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><h1 id="appTitle">Abhishek's Money</h1><p id="appSubtitle">Your money, your rules. 💸</p><div id="globalMessage" class="global-message" aria-live="polite"></div></div><button id="themeBtn" class="theme" onclick="toggleTheme()">☾</button></header>
+<div class="mode"><button id="moneyMode" class="money-active" onclick="switchApp('money')">Money</button><button id="wealthMode" onclick="switchApp('wealth')">Wealth</button></div>
+
+<!-- MONEY APP -->
+<div id="moneyApp" class="app-shell money-page">
+<section id="mhome" class="screen active">
+<div class="hero money-hero"><small>Total spending</small><div class="hero-total" id="mTotal">₹0</div><div class="hero-grid"><div class="hero-stat"><span>Income</span><b id="mIncome">₹0</b></div><div class="hero-stat"><span>Net balance</span><b id="mBalance">₹0</b></div><div class="hero-stat"><span>Transactions</span><b id="mCount">0</b></div></div></div>
+<div class="quick"><div class="quick-card"><b id="mToday">₹0</b><span>Today</span></div><div class="quick-card"><b id="mWeek">₹0</b><span>Last 7 days</span></div><div class="quick-card"><b id="mAvg">₹0</b><span>Daily avg</span></div><div class="quick-card"><b id="mBig">₹0</b><span>Biggest spend</span></div></div>
+<div class="section"><div><h2>Spending trend</h2><span class="small" id="trendCaption">Rolling period · Last 7 days</span></div></div>
+<div class="card trend-card">
+  <div class="trend-toolbar">
+    <div><b id="trendTotal">₹0</b><span class="small" id="trendTotalLabel">Selected period</span></div>
+    <select id="trendPreset" class="trend-select" onchange="onTrendPreset(this.value)" aria-label="Spending trend period"></select>
+  </div>
+  <div id="mBars" class="bars"></div>
+  <div id="trendSummary" class="trend-summary"></div>
+</div>
+<div class="section"><h2>Recent transactions</h2><button onclick="openMoneyPage('transactions')">See all →</button></div><div id="mRecent"></div>
+</section>
+
+<section id="mtransactions" class="screen"><div class="section"><h2>Transactions</h2><span class="small">Money</span></div><input id="mSearch" class="search" placeholder="Search description, category, person or method" oninput="renderMoneyTransactions()"><div class="filters"><button class="active" onclick="setMoneyFilter('all',this)">All</button><button onclick="setMoneyFilter('expense',this)">Expenses</button><button onclick="setMoneyFilter('income',this)">Income</button><button onclick="setMoneyFilter('transfer',this)">Transfers</button></div><div id="mTxList"></div></section>
+
+<section id="manalytics" class="screen"><div class="section"><h2>Money Analytics</h2><span class="small">Monthly</span></div><div class="card"><div class="chart-head"><b id="mAnTotal">₹0</b><span class="small">spent</span></div><div id="mCats"></div></div><div class="section"><h2>Payment usage</h2></div><div class="card" id="mMethods"></div></section>
+
+<section id="mbudgets" class="screen"><div class="section"><h2>Budgets</h2><button onclick="openBudget()">Edit budgets</button></div><div class="card"><div class="chart-head"><b id="budgetSpent">₹0</b><span class="small" id="budgetLabel">of ₹0</span></div><div class="progress" style="margin-top:10px"><i id="budgetBar" style="width:0"></i></div><div class="small" id="budgetText" style="margin-top:7px"></div></div><div class="section"><h2>Category budgets</h2></div><div id="budgetCats"></div></section>
+
+<section id="mmore" class="screen">
+<div class="settings-head"><div><h2>More</h2><div id="moreMessage" class="small">Your financial command center. 🎛️</div></div><button id="diceButton" class="dice-button" onclick="showSurpriseMessage()" aria-label="Show a surprise message">🎲</button></div>
+<div class="card identity-card"><div class="identity-main"><button class="avatar-button" onclick="triggerProfilePhoto()" aria-label="Change profile photo"><div class="profile-avatar large" id="profileAvatar">A</div><span>＋</span></button><div><div class="identity-name" id="profileNameLabel">Abhishek</div><div class="identity-sub" id="identitySub">Your tracker. Your rules. ✨</div></div></div><button class="primary full" onclick="openSettingsPanel()">⚙️ Settings</button></div>
+<div class="card surprise-card"><div><b>Today's tiny chaos</b><div id="surprisePreview" class="surprise-preview">🎲 Tap for something unexpected.</div></div><button class="secondary" onclick="showSurpriseMessage()">Roll 🎲</button></div>
+<div class="card settings-list-card">
+<details><summary>👤 Profile</summary><div class="settings-body"><div class="profile-fields"><div class="profile-field"><label>Name</label><input id="profileNameInput" autocomplete="name" placeholder="Your name"></div><div class="profile-field"><label>Backup email</label><input id="profileEmailInput" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="profile-field"><label>Profile photo</label><input id="profilePhotoInput" type="file" accept="image/*" onchange="setProfilePhoto(this)"></div></div><div class="profile-actions"><button class="primary" onclick="saveProfile()">Save profile</button><button class="secondary" onclick="removeProfilePhoto()">Remove photo</button></div></div></details>
+<details><summary>🎨 Appearance & text</summary><div class="settings-body"><div class="small">Theme</div><div class="savebar"><button class="secondary" onclick="setThemePreference(false)">☀ Day</button><button class="secondary" onclick="setThemePreference(true)">☾ Night</button><button class="secondary" onclick="setThemePreference(null)">Auto</button></div><div class="small" style="margin-top:12px">Text size</div><div class="text-scale-row"><button id="textSmall" onclick="setTextScale('small')">Small</button><button id="textNormal" onclick="setTextScale('normal')">Normal</button><button id="textLarge" onclick="setTextScale('large')">Large</button></div></div></details>
+<details><summary>🧩 Money categories</summary><div class="settings-body"><div id="mCatsManage"></div><button class="link" onclick="openCategory()">＋ Add category</button></div></details>
+<details><summary>💳 Payment methods</summary><div class="settings-body"><div id="mMethodsManage"></div><button class="link" onclick="openMethod()">＋ Add payment method</button></div></details>
+<details><summary>🏦 Income accounts</summary><div class="settings-body"><div id="mIncomeManage"></div><button class="link" onclick="openIncomeAccount()">＋ Add account</button></div></details>
+<details><summary>💾 Backup & transfer</summary><div class="settings-body"><div class="small">One portable JSON backup. No cloud API, no silent uploads.</div><div class="more-grid" style="margin-top:10px"><button class="more-action" onclick="backupData()">⬇ Backup<span>Update your backup file</span></button><button class="more-action" onclick="importData()">⬆ Restore<span>Replace current data</span></button><button class="more-action" onclick="mergeData()">＋ Merge<span>Combine records</span></button><button class="more-action" onclick="exportCSV()">▤ CSV<span>Money transactions</span></button></div></div></details>
+<details><summary>🧠 Personalization</summary><div class="settings-body"><div class="small">The app adapts messages and headers using your current screen, mode, time and financial state.</div><div class="personal-options"><label><input id="personalEnabled" type="checkbox" checked onchange="setPersonalization('enabled',this.checked)"> Personalized experience</label><label><input id="personalFunny" type="checkbox" checked onchange="setPersonalization('funny',this.checked)"> Funny / sarcastic lines</label><label><input id="personalFacts" type="checkbox" checked onchange="setPersonalization('facts',this.checked)"> Finance facts</label></div></div></details>
+<details><summary>🧨 Reset app data</summary><div class="settings-body"><div class="small">Deletes local Money + Wealth data. Backup first unless chaos is the goal.</div><button class="secondary danger-wide" onclick="resetProfile()">Reset all data</button></div></details>
+</div>
+</section>
+</div>
+
+<!-- WEALTH APP -->
+<div id="wealthApp" class="app-shell wealth-page" style="display:none">
+<section id="whome" class="screen active">
+<div class="wealth-hero"><small>Total net worth</small><div class="worth" id="wNetWorth">₹0</div><div class="wealth-delta" id="wDelta">Assets − liabilities + receivable − payable</div></div>
+<div class="metric-grid"><div class="metric"><span class="small">Assets</span><b id="wAssets">₹0</b></div><div class="metric"><span class="small">Liabilities</span><b id="wLiab">₹0</b></div><div class="metric"><span class="small">Owed to you</span><b id="wLend">₹0</b></div><div class="metric"><span class="small">You owe</span><b id="wBorrow">₹0</b></div></div>
+<div class="section"><h2>Wealth mix</h2><span class="small">Current</span></div><div class="card"><div class="mix" id="wMix"></div><div class="legend" id="wLegend"></div></div>
+<div class="section"><h2>Assets</h2><button onclick="openWealthPage('networth')">Manage →</button></div><div id="wAssetPreview"></div>
+<div class="section"><h2>Liabilities</h2><button onclick="openWealthPage('networth')">Manage →</button></div><div id="wLiabPreview"></div>
+<div class="section"><h2>Money owed</h2><button onclick="openWealthPage('debts')">Open →</button></div><div id="wDebtPreview"></div><div class="section"><h2>Milestones</h2><button onclick="openWealthPage('more')">Manage →</button></div><div id="wMilestonePreview"></div>
+</section>
+
+<section id="wnetworth" class="screen"><div class="section"><h2>Net Worth</h2><span class="small">Wealth records</span></div><div class="wealth-hero"><small>Current net worth</small><div class="worth" id="nwTotal">₹0</div><div class="wealth-delta">All wealth records combined.</div></div>
+<div class="section"><h2>Fixed Deposits</h2><button onclick="openFd()">+ Add</button></div><div id="fdList"></div>
+<div class="section"><h2>Mutual Funds</h2><button onclick="openMf()">+ Add</button></div><div id="mfList"></div>
+<div class="section"><h2>Stocks / ETFs</h2><button onclick="openStock()">+ Add</button></div><div id="stockList"></div>
+<div class="section"><h2>EPFO</h2><button onclick="openEpfo()">Edit</button></div><div class="card" id="epfoCard"></div>
+<div class="section"><h2>Loans</h2><button onclick="openLoan()">+ Add</button></div><div id="loanList"></div>
+<div class="section"><h2>Other Assets</h2><button onclick="openAsset()">+ Add</button></div><div id="otherAssetList"></div>
+<div class="section"><h2>Net worth history</h2></div><div class="card" id="worthHistory"></div></section>
+
+<section id="wtransactions" class="screen"><div class="section"><h2>Wealth activity</h2><span class="small">Not Money transactions</span></div><div class="card"><div id="wealthActivity"></div></div></section>
+
+<section id="wanalytics" class="screen wealth-analytics-screen">
+<div class="section"><div><h2>Wealth Analytics</h2><span class="small">A clean view of where your wealth sits</span></div><span class="wealth-pill">LIVE</span></div>
+<div class="wealth-kpi-card"><div class="wealth-kpi-label">Total net worth</div><div class="wealth-kpi-value" id="waNet">₹0</div><div class="wealth-kpi-note">Assets minus liabilities, adjusted for money owed</div></div>
+<div class="wealth-stat-grid">
+  <div class="wealth-stat"><span>Assets</span><b id="waAssets">₹0</b><i></i></div>
+  <div class="wealth-stat"><span>Liabilities</span><b id="waLiab">₹0</b><i></i></div>
+  <div class="wealth-stat"><span>Owed to you</span><b id="waLend">₹0</b><i></i></div>
+  <div class="wealth-stat"><span>You owe</span><b id="waBorrow">₹0</b><i></i></div>
+</div>
+<div class="section"><h2>Where your wealth is</h2><span class="small">Current value</span></div>
+<div class="wealth-allocation-card"><div class="wealth-allocation-head"><span>Allocation</span><b id="waAllocTotal">₹0</b></div><div id="waAlloc"></div></div>
+<div class="section"><h2>Balance breakdown</h2></div>
+<div class="wealth-breakdown-card" id="waBreak"></div>
+</section>
+
+<section id="wdebts" class="screen"><div class="section"><div><h2>Money owed</h2><span class="small">Receivable and payable balances</span></div><button class="wealth-link" onclick="openDebt()">+ Add</button></div><div class="wealth-dashboard-card"><div class="goal-kpi"><span>Owed to you</span><b id="wdLend">₹0</b></div><div class="goal-kpi"><span>You owe</span><b id="wdBorrow">₹0</b></div></div><div id="debtList"></div></section>
+
+<section id="wbudgets" class="screen"><div class="section"><div><h2>Wealth milestones</h2><span class="small">Goals, progress and target dates</span></div><button class="wealth-link" onclick="openMilestone()">+ Add</button></div><div class="wealth-dashboard-card"><div class="goal-kpi"><span>Active goals</span><b id="wGoalCount">0</b></div><div class="goal-kpi"><span>Overall progress</span><b id="wGoalProgress">0%</b></div></div><div id="wealthBudgetMilestones"></div></section>
+
+<section id="wmore" class="screen">
+<div class="settings-head"><div><h2>More</h2><div id="wealthMoreMessage" class="small">Your wealth corner. 📈</div></div><button class="dice-button" onclick="showSurpriseMessage()" aria-label="Show a surprise message">🎲</button></div>
+<div class="card identity-card"><div class="identity-main"><button class="avatar-button" onclick="triggerProfilePhoto()" aria-label="Change profile photo"><div class="profile-avatar large" id="wealthProfileAvatar">A</div><span>＋</span></button><div><div class="identity-name" id="wealthProfileNameLabel">Abhishek</div><div class="identity-sub">Building future-you money. 🧠</div></div></div><button class="primary full" onclick="openSettingsPanel()">⚙️ Settings</button></div>
+<div class="card surprise-card"><div><b>Wealth thought</b><div id="wealthSurprisePreview" class="surprise-preview">🎲 Tap for something unexpected.</div></div><button class="secondary" onclick="showSurpriseMessage()">Roll 🎲</button></div>
+<div class="card settings-list-card"><details><summary>👤 Profile</summary><div class="settings-body"><div class="profile-fields"><div class="profile-field"><label>Name</label><input id="wealthProfileNameInput" autocomplete="name" placeholder="Your name"></div><div class="profile-field"><label>Backup email</label><input id="wealthProfileEmailInput" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="profile-field"><label>Profile photo</label><input id="wealthProfilePhotoInput" type="file" accept="image/*" onchange="setProfilePhoto(this)"></div></div><div class="profile-actions"><button class="primary" onclick="saveProfile()">Save profile</button><button class="secondary" onclick="removeProfilePhoto()">Remove photo</button></div></div></details><details><summary>🎨 Appearance & text</summary><div class="settings-body"><div class="small">Theme</div><div class="savebar"><button class="secondary" onclick="setThemePreference(false)">☀ Day</button><button class="secondary" onclick="setThemePreference(true)">☾ Night</button><button class="secondary" onclick="setThemePreference(null)">Auto</button></div><div class="small" style="margin-top:12px">Text size</div><div class="text-scale-row"><button id="wealthTextSmall" onclick="setTextScale('small')">Small</button><button id="wealthTextNormal" onclick="setTextScale('normal')">Normal</button><button id="wealthTextLarge" onclick="setTextScale('large')">Large</button></div></div></details><details><summary>💾 Backup & transfer</summary><div class="settings-body"><div class="small">One portable JSON backup. No cloud API, no silent uploads.</div><div class="more-grid" style="margin-top:10px"><button class="more-action" onclick="backupData()">⬇ Backup<span>Update your backup file</span></button><button class="more-action" onclick="importData()">⬆ Restore<span>Replace current data</span></button><button class="more-action" onclick="mergeData()">＋ Merge<span>Combine records</span></button><button class="more-action" onclick="exportCSV()">▤ CSV<span>Money transactions</span></button></div></div></details><details><summary>🧠 Personalization</summary><div class="settings-body"><div class="small">Adaptive headers and messages use your current mode, screen, time and financial state.</div><div class="personal-options"><label><input id="wealthPersonalEnabled" type="checkbox" checked onchange="setPersonalization('enabled',this.checked)"> Personalized experience</label><label><input id="wealthPersonalFunny" type="checkbox" checked onchange="setPersonalization('funny',this.checked)"> Funny / sarcastic lines</label><label><input id="wealthPersonalFacts" type="checkbox" checked onchange="setPersonalization('facts',this.checked)"> Finance facts</label></div></div></details><details><summary>🧨 Reset app data</summary><div class="settings-body"><div class="small">Deletes local Money + Wealth data. Backup first unless chaos is the goal.</div><button class="secondary danger-wide" onclick="resetProfile()">Reset all data</button></div></details></div>
+<div class="card wealth-milestone-card" style="margin-top:12px"><div class="section" style="margin:0 0 6px"><div><h2 style="font-size:16px">Milestones</h2><div class="small">Targets you want to reach</div></div><button onclick="openMilestone()">+ Add</button></div><div id="wealthMilestones"></div></div>
+</section>
+</div>
+
+</div>
+
+<button id="fab" class="fab" onclick="contextAdd()">+</button>
+
+<nav><div class="navinner">
+<button id="navHome" class="navitem money-selected" data-section="home" onclick="navigate('home')"><span>⌂</span>Home</button>
+<button id="navTx" class="navitem" data-section="transactions" onclick="navigate('transactions')"><span>≡</span>Transactions</button>
+<button id="navAnalytics" class="navitem" data-section="analytics" onclick="navigate('analytics')"><span>◔</span>Analytics</button>
+<button id="navBudget" class="navitem" data-section="budgets" onclick="navigate('budgets')"><span>▣</span>Budgets</button>
+<button id="navMore" class="navitem" data-section="more" onclick="openMore();return false;"><span>⋯</span>More</button>
+</div></nav>
+
+<!-- All modals -->
+<div id="actionModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="actionTitle">Add transaction</h2><button class="close" onclick="closeModal('actionModal')">✕</button></div><p class="small" id="actionSub"></p><div id="moneyActions" class="action-grid"><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'expense')">💸<b>Expense</b><span>Record spending</span></button><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'income')">💰<b>Income</b><span>Salary, bonus, gift</span></button><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'transfer')">🤝<b>Personal transfer</b><span>Send money to someone</span></button></div><div id="wealthActions" class="action-grid" style="display:none"><button class="action-card" onclick="closeModal('actionModal');openFd()">🏧<b>Fixed Deposit</b><span>Book or update FD</span></button><button class="action-card" onclick="closeModal('actionModal');openMf()">📈<b>Mutual Fund</b><span>Track current value</span></button><button class="action-card" onclick="closeModal('actionModal');openDebt()">🤝<b>Money Owed</b><span>Lent or borrowed</span></button><button class="action-card" onclick="closeModal('actionModal');openEpfo()">🏢<b>EPFO</b><span>Update or correct balance</span></button><button class="action-card" onclick="closeModal('actionModal');openLoan()">🏦<b>Loan</b><span>Balance and EMI</span></button><button class="action-card" onclick="closeModal('actionModal');openStock()">📊<b>Stocks / ETFs</b><span>Track holdings</span></button><button class="action-card" onclick="closeModal('actionModal');openAsset()">🏠<b>Other asset</b><span>Gold, property, etc.</span></button></div></div></div>
+
+<div id="txModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="txTitle">Add transaction</h2><button class="close" onclick="closeModal('txModal')">✕</button></div><label>Type</label><div class="types"><button id="te" onclick="setTxType('expense')">Expense</button><button id="ti" onclick="setTxType('income')">Income</button><button id="tt" onclick="setTxType('transfer')">Personal transfer</button></div>
+<div id="normalFields"><label>Amount <span class="req">*</span></label><input id="fAmount" type="number" inputmode="decimal" min="0" step=".01"><label>Category <span class="req">*</span></label><select id="fCat"></select><label id="methodLabel">Payment method <span class="req">*</span></label><select id="fMethod"></select><label id="accountLabel" style="display:none">Credited account</label><select id="fAccount" style="display:none"></select><label>Date</label><input id="fDate" type="date"><label>Description <span class="small">(optional)</span></label><input id="fDesc"></div>
+<div id="transferFields" style="display:none"><label>Amount <span class="req">*</span></label><input id="tAmount" type="number" inputmode="decimal" min="0"><label>To whom <span class="req">*</span></label><input id="tPerson"><label>Occasion / purpose</label><input id="tOccasion"><label>Payment method <span class="req">*</span></label><select id="tMethod"></select><label>Date</label><input id="tDate" type="date"></div>
+<div class="savebar"><button class="secondary" onclick="closeModal('txModal')">Cancel</button><button class="primary" onclick="saveTransaction()">Save</button></div></div></div>
+
+<div id="txActionModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="txActionTitle">Transaction</h2><button class="close" onclick="closeModal('txActionModal')">✕</button></div><div class="small" id="txActionMeta"></div><div class="tx-action-list"><button onclick="editSelectedTransaction()">✏️ Edit transaction</button><button class="danger" onclick="deleteSelectedTransaction()">🗑️ Delete transaction</button></div></div></div>
+
+<div id="categoryModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="catTitle">Add category</h2><button class="close" onclick="closeModal('categoryModal')">✕</button></div><label>Name</label><input id="catName"><label>Icon</label><input id="catIcon" maxlength="2" placeholder="✈️"><div class="savebar"><button class="secondary" onclick="closeModal('categoryModal')">Cancel</button><button class="primary" onclick="saveCategory()">Save</button></div></div></div>
+<div id="methodModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="methodTitle">Add payment method</h2><button class="close" onclick="closeModal('methodModal')">✕</button></div><label>Name</label><input id="methodName"><label>Type</label><select id="methodType"><option>Bank account</option><option>Credit card</option><option>Debit card</option><option>Cash</option><option>UPI</option><option>Wallet</option><option>Other</option></select><div class="savebar"><button class="secondary" onclick="closeModal('methodModal')">Cancel</button><button class="primary" onclick="saveMethod()">Save</button></div></div></div>
+<div id="incomeModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Income account</h2><button class="close" onclick="closeModal('incomeModal')">✕</button></div><label>Account name</label><input id="incomeName"><div class="savebar"><button class="secondary" onclick="closeModal('incomeModal')">Cancel</button><button class="primary" onclick="saveIncomeAccount()">Save</button></div></div></div>
+<div id="budgetModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Budgets</h2><button class="close" onclick="closeModal('budgetModal')">✕</button></div><label>Overall monthly budget</label><input id="overallBudgetInput" type="number" inputmode="decimal" min="0" step="1000"><div id="budgetEdit"></div><div class="savebar"><button class="secondary" onclick="closeModal('budgetModal')">Cancel</button><button class="primary" onclick="saveBudgets()">Save</button></div></div></div>
+
+<div id="debtModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="debtTitle">Add money owed</h2><button class="close" onclick="closeModal('debtModal')">✕</button></div><label>Type</label><div class="types"><button id="lendType" onclick="setDebtType('lend')">I lent money</button><button id="borrowType" onclick="setDebtType('borrow')">I borrowed</button></div><label>Person <span class="req">*</span></label><input id="dPerson"><label>Amount <span class="req">*</span></label><input id="dAmount" type="number" inputmode="decimal" min="0"><label>Reason / occasion</label><input id="dReason"><label>Due date</label><input id="dDue" type="date"><label>Reminder note</label><input id="dNote"><div class="savebar"><button class="secondary" onclick="closeModal('debtModal')">Cancel</button><button class="primary" onclick="saveDebt()">Save</button></div></div></div>
+<div id="repayModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Record repayment</h2><button class="close" onclick="closeModal('repayModal')">✕</button></div><div id="repaySummary" class="card"></div><label>Amount repaid <span class="req">*</span></label><input id="repayAmount" type="number" inputmode="decimal" min="0"><label>Date</label><input id="repayDate" type="date"><div class="savebar"><button class="secondary" onclick="closeModal('repayModal')">Cancel</button><button class="primary" onclick="saveRepayment()">Save</button></div></div></div>
+<div id="epfoModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>EPFO update</h2><button class="close" onclick="closeModal('epfoModal')">✕</button></div><label>Current balance</label><input id="eBalance" type="number" inputmode="decimal"><label>Expected monthly contribution</label><input id="eContribution" type="number" inputmode="decimal"><label>Update date</label><input id="eDate" type="date"><div class="savebar"><button class="secondary" onclick="closeModal('epfoModal')">Cancel</button><button class="primary" onclick="saveEpfo()">Save</button></div></div></div>
+<div id="mfModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="mfTitle">Add mutual fund</h2><button class="close" onclick="closeModal('mfModal')">✕</button></div><label>Fund name <span class="req">*</span></label><input id="mfName"><div class="two"><div><label>Invested</label><input id="mfInvested" type="number" inputmode="decimal"></div><div><label>Current value <span class="req">*</span></label><input id="mfValue" type="number" inputmode="decimal"></div></div><div class="two"><div><label>Units</label><input id="mfUnits" type="number" inputmode="decimal" step=".0001"></div><div><label>Updated</label><input id="mfDate" type="date"></div></div><div class="savebar"><button class="secondary" onclick="closeModal('mfModal')">Cancel</button><button class="primary" onclick="saveMf()">Save</button></div></div></div>
+<div id="fdModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="fdTitle">Add fixed deposit</h2><button class="close" onclick="closeModal('fdModal')">✕</button></div><label>Bank <span class="req">*</span></label><input id="fdBank"><label>Principal <span class="req">*</span></label><input id="fdPrincipal" type="number" inputmode="decimal"><div class="two"><div><label>Interest %</label><input id="fdRate" type="number" step=".01" inputmode="decimal"></div><div><label>Current value</label><input id="fdValue" type="number" inputmode="decimal"></div></div><div class="two"><div><label>Start date</label><input id="fdStart" type="date"></div><div><label>Maturity date</label><input id="fdMaturity" type="date"></div></div><div class="savebar"><button class="secondary" onclick="closeModal('fdModal')">Cancel</button><button class="primary" onclick="saveFd()">Save</button></div></div></div>
+<div id="stockModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="stockTitle">Add stock / ETF</h2><button class="close" onclick="closeModal('stockModal')">✕</button></div><label>Name / ticker <span class="req">*</span></label><input id="stockName" placeholder="NIFTYBEES, RELIANCE..."><div class="two"><div><label>Quantity</label><input id="stockQty" type="number" inputmode="decimal" step=".0001"></div><div><label>Avg. price</label><input id="stockAvg" type="number" inputmode="decimal"></div></div><div class="two"><div><label>Current price</label><input id="stockPrice" type="number" inputmode="decimal"></div><div><label>Current value <span class="req">*</span></label><input id="stockValue" type="number" inputmode="decimal"></div></div><label>Updated</label><input id="stockDate" type="date"><div class="savebar"><button class="secondary" onclick="closeModal('stockModal')">Cancel</button><button class="primary" onclick="saveStock()">Save</button></div></div></div>
+<div id="loanModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="loanTitle">Add loan</h2><button class="close" onclick="closeModal('loanModal')">✕</button></div><label>Loan name <span class="req">*</span></label><input id="loanName" placeholder="Home Loan"><label>Outstanding balance <span class="req">*</span></label><input id="loanOutstanding" type="number" inputmode="decimal"><div class="two"><div><label>EMI</label><input id="loanEmi" type="number" inputmode="decimal"></div><div><label>Interest %</label><input id="loanRate" type="number" inputmode="decimal"></div></div><div class="two"><div><label>Tenure (months)</label><input id="loanTenure" type="number"></div><div><label>EMIs paid</label><input id="loanPaid" type="number"></div></div><label>Next EMI date</label><input id="loanNext" type="date"><div class="savebar"><button class="secondary" onclick="closeModal('loanModal')">Cancel</button><button class="primary" onclick="saveLoan()">Save</button></div></div></div>
+<div id="assetModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="assetTitle">Add other asset</h2><button class="close" onclick="closeModal('assetModal')">✕</button></div><label>Asset name <span class="req">*</span></label><input id="assetName" placeholder="Gold, property, cash..."><label>Type</label><select id="assetType"><option>Gold</option><option>Property</option><option>Cash</option><option>Vehicle</option><option>Crypto</option><option>Business</option><option>Other</option></select><label>Current value <span class="req">*</span></label><input id="assetValue" type="number" inputmode="decimal"><label>Updated</label><input id="assetDate" type="date"><div class="savebar"><button class="secondary" onclick="closeModal('assetModal')">Cancel</button><button class="primary" onclick="saveAsset()">Save</button></div></div></div>
+
+<div id="trendDateModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="trendDateTitle">Choose trend period</h2><button class="close" onclick="closeModal('trendDateModal')">✕</button></div><p class="small">Pick the month or year used by the trend. Rolling ranges stay based on today.</p><div class="two"><div><label>Month</label><select id="trendMonthSelect"></select></div><div><label>Year</label><select id="trendYearSelect"></select></div></div><div class="savebar"><button class="secondary" onclick="closeModal('trendDateModal')">Cancel</button><button class="primary" onclick="applyTrendDate()">Apply</button></div></div></div>
+
+<div id="milestoneModal" class="modal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="milestoneTitle">Add milestone</h2><button class="close" onclick="closeModal('milestoneModal')">✕</button></div>
+<label>Goal name <span class="req">*</span></label><input id="msName" placeholder="Emergency fund, ₹10L net worth...">
+<label>Target amount <span class="req">*</span></label><input id="msTarget" type="number" inputmode="decimal" min="0">
+<label>Current amount</label><input id="msCurrent" type="number" inputmode="decimal" min="0">
+<label>Target date</label><input id="msDate" type="date">
+<div class="savebar"><button class="secondary" onclick="closeModal('milestoneModal')">Cancel</button><button class="primary" onclick="saveMilestone()">Save</button></div>
+</div></div>
+<script>
+const KEY='spend_tracker_v11', PROFILE_KEY='spend_tracker_profile_v18_1', BACKUP_DB='spend_tracker_backup_v18_1';
+const uid=()=>crypto.randomUUID(),today=()=>new Date().toISOString().slice(0,10),todayISO=()=>today(),money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const catsSeed=[['Food','🍜'],['Transport','🚕'],['Shopping','🛍️'],['Bills','🧾'],['Entertainment','🎬'],['Health','💊'],['Other','💸']];
+const incomeSeed=[['Salary','💼'],['Bonus','🎁'],['Gift','🎀'],['Other income','💰']];
+const methodsSeed=[['HDFC Credit Card','Credit card'],['SBI Account','Bank account'],['Cash','Cash'],['UPI','UPI']];
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+money:{tx:[],cats:catsSeed.map(x=>({id:uid(),name:x[0],icon:x[1]})),incomeCats:incomeSeed.map(x=>({id:uid(),name:x[0],icon:x[1]})),methods:methodsSeed.map(x=>({id:uid(),name:x[0],type:x[1]})),incomeAccounts:[{id:uid(),name:'Kotak Account'}],budgets:{overall:50000,categories:{}}},
+wealth:{debts:[],assets:[],mfs:[],fds:[],stocks:[],loans:[],epfo:{balance:0,contribution:0,date:today()},history:[],milestones:[]},
+dark:false, themeMode:'manual', textScale:'normal'
+};
+state.money??={tx:[],cats:[],incomeCats:[],methods:[],incomeAccounts:[{id:uid(),name:'Kotak Account'}],budgets:{overall:0,categories:{}}};
+state.money.budgets??={overall:0,categories:{}};state.money.budgets.categories??={};
+state.wealth??={debts:[],assets:[],mfs:[],fds:[],stocks:[],loans:[],epfo:{balance:0,contribution:0,date:today()},history:[]};
+state.wealth.debts??=[];state.wealth.assets??=[];state.wealth.mfs??=[];state.wealth.fds??=[];state.wealth.stocks??=[];state.wealth.loans??=[];
+state.wealth.epfo??={balance:0,contribution:0,date:today()};state.wealth.history??=[];state.wealth.milestones??=[];state.themeMode??='manual';state.textScale??='normal';
+
+// One-time migration from V5–V10 storage. V11 never overwrites a non-empty V11 dataset.
+(function migrateLegacy(){
+  if(localStorage.getItem(KEY)) return;
+  const keys=['spend_tracker_v11','spend_tracker_v12','spend_tracker_v10','spend_tracker_v9','spend_tracker_v8','spend_tracker_v7','spend_tracker_v6','spend_tracker_v5'];
+  for(const k of keys){
+    try{const raw=localStorage.getItem(k);if(!raw)continue;const old=JSON.parse(raw);if(old?.money||old?.wealth){state=old;state.money??={tx:[],cats:[],incomeCats:[],methods:[],incomeAccounts:[{id:uid(),name:'Income account'}],budgets:{overall:0,categories:{}}};state.money.budgets??={overall:0,categories:{}};state.money.budgets.categories??={};state.wealth??={debts:[],assets:[],mfs:[],fds:[],stocks:[],loans:[],epfo:{balance:0,contribution:0,date:today()},history:[],milestones:[]};state.wealth.debts??=[];state.wealth.assets??=[];state.wealth.mfs??=[];state.wealth.fds??=[];state.wealth.stocks??=[];state.wealth.loans??=[];state.wealth.epfo??={balance:0,contribution:0,date:today()};state.wealth.history??=[];state.wealth.milestones??=[];state.themeMode??='manual';state.textScale??='normal';save();break;}}catch(e){}}
+})();
+
+let app={mode:'money',moneyPage:'home',wealthPage:'home',month:new Date(new Date().getFullYear(),new Date().getMonth(),1),trend:'7',txFilter:'all',editingTx:null,editingCat:null,editingMethod:null,editingIncome:null,editingDebt:null,editingMf:null,editingFd:null,editingStock:null,editingLoan:null,editingAsset:null,editingRepay:null,editingMilestone:null,txType:'expense',debtType:'lend'};
+
+function $(id){return document.getElementById(id)}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));try{navigator.storage?.persist?.().catch?.(()=>{})}catch(e){}}
+function refresh(){
+  save();
+  renderTheme();
+  renderShell();
+  if(app.mode==='money') renderMoney(); else renderWealth();
+  renderMore();
+}
+function renderTheme(){
+  document.body.classList.toggle('dark',!!state.dark);
+  document.body.classList.toggle('text-small',state.textScale==='small');
+  document.body.classList.toggle('text-large',state.textScale==='large');
+  $('themeBtn').textContent=state.dark?'☀':'☾';
+  $('themeBtn').setAttribute('aria-label',state.dark?'Switch to light mode':'Switch to dark mode');
+  ['textSmall','textNormal','textLarge','wealthTextSmall','wealthTextNormal','wealthTextLarge'].forEach(id=>$(id)?.classList.remove('sel'));
+  $((state.textScale==='small'?'textSmall':state.textScale==='large'?'textLarge':'textNormal'))?.classList.add('sel');
+  $((state.textScale==='small'?'wealthTextSmall':state.textScale==='large'?'wealthTextLarge':'wealthTextNormal'))?.classList.add('sel');
+}
+
+let pendingDelete=null;
+function askDelete(kind,id,label='this entry'){
+  pendingDelete={kind,id};
+  const m=$('deleteMessage'); if(m)m.textContent=`Delete ${label}? This cannot be undone from the app.`;
+  $('deleteModal')?.classList.add('show');
+}
+function closeDelete(){pendingDelete=null;$('deleteModal')?.classList.remove('show')}
+function confirmDelete(){
+  if(!pendingDelete)return;
+  const {kind,id}=pendingDelete,w=state.wealth;
+  if(kind==='tx') state.money.tx=state.money.tx.filter(x=>x.id!==id);
+  else if(kind==='fd') w.fds=w.fds.filter(x=>x.id!==id);
+  else if(kind==='mf') w.mfs=w.mfs.filter(x=>x.id!==id);
+  else if(kind==='stock') w.stocks=w.stocks.filter(x=>x.id!==id);
+  else if(kind==='loan') w.loans=w.loans.filter(x=>x.id!==id);
+  else if(kind==='asset') w.assets=w.assets.filter(x=>x.id!==id);
+  else if(kind==='debt') w.debts=w.debts.filter(x=>x.id!==id);
+  else if(kind==='milestone') w.milestones=w.milestones.filter(x=>x.id!==id);
+  else if(kind==='epfo') w.epfo={balance:0,contribution:0,date:today()};
+  save(); closeDelete(); refresh();
+}
+
+function renderShell(){
+  const moneyMode=app.mode==='money';
+  $('moneyApp').style.display=moneyMode?'block':'none';
+  $('wealthApp').style.display=moneyMode?'none':'block';
+  $('moneyMode').className=moneyMode?'money-active':'';
+  $('wealthMode').className=moneyMode?'':'wealth-active';
+  const page=moneyMode?app.moneyPage:app.wealthPage;
+  document.querySelectorAll('.navitem').forEach(b=>{
+    b.classList.remove('money-selected','wealth-selected');
+    if(b.dataset.section===page || (!moneyMode && page==='debts' && b.dataset.section==='more'))b.classList.add(moneyMode?'money-selected':'wealth-selected');
+  });
+  document.querySelectorAll('#moneyApp .screen').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('#wealthApp .screen').forEach(x=>x.classList.remove('active'));
+  const el=$(moneyMode?'m'+page:'w'+page); if(el)el.classList.add('active');
+  $('fab').classList.toggle('wealth',!moneyMode);
+  updateContextActions();
+}
+function updateContextActions(){const wm=app.mode==='wealth';$('moneyActions').style.display=wm?'none':'grid';$('wealthActions').style.display=wm?'grid':'none'}
+function switchApp(mode){
+  if(mode!=='money'&&mode!=='wealth')return;
+  try{const fresh=JSON.parse(localStorage.getItem(KEY)||'null');if(fresh?.money&&fresh?.wealth)state=fresh;}catch(e){}
+  app.mode=mode;
+  app.moneyPage=app.moneyPage||'home';app.wealthPage=app.wealthPage||'home';
+  if(mode==='wealth'&&!$('w'+app.wealthPage))app.wealthPage='home';
+  if(mode==='money'&&!$('m'+app.moneyPage))app.moneyPage='home';
+  refresh();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function navigate(section){
+  if(app.mode==='wealth') openWealthPage(section); else openMoneyPage(section);
+}
+function openMoneyPage(p){const target=p||'home';app.moneyPage=$('m'+target)?target:'home';refresh();window.scrollTo({top:0,behavior:'smooth'})}
+function openWealthPage(p){const target=p||'home';app.wealthPage=$('w'+target)?target:'home';refresh();window.scrollTo({top:0,behavior:'smooth'})}
+function openMore(){
+  if(app.mode==='wealth'){app.wealthPage=$('wmore')?'more':'home'}else{app.moneyPage=$('mmore')?'more':'home'}
+  refresh();
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{$('navMore')?.focus({preventScroll:true});},0);
+}
+function goHome(){navigate('home')}
+function contextAdd(){if(app.mode==='money')openAction('money');else openAction('wealth')}
+function openAction(mode){$('actionTitle').textContent=mode==='money'?'Add transaction':'Add to Wealth';$('actionSub').textContent=mode==='money'?'Choose one money action.':'Choose one wealth record.';$('moneyActions').style.display=mode==='money'?'grid':'none';$('wealthActions').style.display=mode==='wealth'?'grid':'none';$('actionModal').classList.add('show')}
+function closeModal(id){$(id).classList.remove('show')}
+function toggleTheme(){state.dark=!state.dark;state.themeMode='manual';save();renderTheme()}
+function setThemePreference(v){if(v===null){state.themeMode='auto';state.dark=window.matchMedia?.('(prefers-color-scheme: dark)').matches||false}else{state.themeMode='manual';state.dark=!!v}save();renderTheme();refresh()}
+function setTextScale(v){state.textScale=['small','normal','large'].includes(v)?v:'normal';save();renderTheme();refresh()}
+function renderMoney(){
+  const m=monthTx(),e=m.filter(x=>x.type==='expense'),i=m.filter(x=>x.type==='income');
+  const spent=e.reduce((s,x)=>s+Number(x.amount||0),0),inc=i.reduce((s,x)=>s+Number(x.amount||0),0);
+  $('mTotal').textContent=money(spent);$('mIncome').textContent=money(inc);$('mBalance').textContent=money(inc-spent);$('mCount').textContent=m.length;
+  const now=new Date(),dk=todayISO(),todayAmt=state.money.tx.filter(x=>x.type==='expense'&&x.date.slice(0,10)===dk).reduce((s,x)=>s+Number(x.amount||0),0),weekAmt=state.money.tx.filter(x=>x.type==='expense'&&(now-new Date(x.date))/864e5<7).reduce((s,x)=>s+Number(x.amount||0),0);
+  $('mToday').textContent=money(todayAmt);$('mWeek').textContent=money(weekAmt);$('mAvg').textContent=money(spent/Math.max(1,new Date(app.month.getFullYear(),app.month.getMonth()+1,0).getDate()));$('mBig').textContent=money(Math.max(0,...e.map(x=>Number(x.amount||0))));
+  renderTrend();renderMoneyTransactions();renderMoneyAnalytics();renderBudgets();
+}
+function moneyMonth(d){app.month=new Date(app.month.getFullYear(),app.month.getMonth()+d,1);renderMoney()}
+function monthTx(){return state.money.tx.filter(x=>{const d=new Date(x.date);return d.getFullYear()===app.month.getFullYear()&&d.getMonth()===app.month.getMonth()})}
+function initTrendPreset(){
+  const sel=$('trendPreset');if(!sel)return;
+  const options=[['7','Last 7 days'],['30','Last 30 days'],['60','Last 60 days'],['90','Last 90 days'],['180','Last 180 days'],['365','Last 365 days'],['month','Selected month'],['prev','Previous month'],['year','Selected year'],['custom-month','Select month…'],['custom-year','Select year…']];
+  sel.innerHTML=options.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');sel.value=app.trend||'7';
+}
+function openTrendDate(kind){
+  const ms=$('trendMonthSelect'),ys=$('trendYearSelect');if(!ms||!ys)return;
+  const y=app.month.getFullYear(),m=app.month.getMonth()+1;
+  ms.innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}">${new Date(2000,i,1).toLocaleDateString('en-IN',{month:'long'})}</option>`).join('');
+  ys.innerHTML=Array.from({length:15},(_,i)=>{const yy=new Date().getFullYear()-7+i;return `<option value="${yy}">${yy}</option>`}).join('');
+  ms.value=String(m);ys.value=String(y);$('trendDateTitle').textContent=kind==='year'?'Choose year':'Choose month';$('trendDateModal').classList.add('show');
+}
+function applyTrendDate(){app.month=new Date(+$('trendYearSelect').value,+$('trendMonthSelect').value-1,1);app.trend=$('trendDateTitle').textContent.includes('year')?'year':'month';closeModal('trendDateModal');renderMoney()}
+function onTrendPreset(v){
+  if(v==='custom-month'||v==='custom-year'){openTrendDate(v==='custom-year'?'year':'month');return}
+  app.trend=v;renderTrend();
+}
+function renderTrend(){
+  initTrendPreset();
+  const r=app.trend||'7',now=new Date();let start,end,caption='';
+  if(['7','30','60','90','180','365'].includes(r)){
+    const n=+r;end=new Date(now.getFullYear(),now.getMonth(),now.getDate());start=new Date(end);start.setDate(start.getDate()-n+1);caption=`Rolling period · Last ${n} days`;
+  }else if(r==='month'){
+    start=new Date(app.month.getFullYear(),app.month.getMonth(),1);end=new Date(app.month.getFullYear(),app.month.getMonth()+1,0);caption=`${app.month.toLocaleDateString('en-IN',{month:'long',year:'numeric'})} · Selected month`;
+  }else if(r==='prev'){
+    start=new Date(app.month.getFullYear(),app.month.getMonth()-1,1);end=new Date(app.month.getFullYear(),app.month.getMonth(),0);caption=`${end.toLocaleDateString('en-IN',{month:'long',year:'numeric'})} · Previous month`;
+  }else{
+    start=new Date(app.month.getFullYear(),0,1);end=new Date(app.month.getFullYear(),11,31);caption=`${app.month.getFullYear()} · Selected year`;
+  }
+  const dates=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1))dates.push(new Date(d));
+  const ex=state.money.tx.filter(x=>x.type==='expense');
+  const vals=dates.map(d=>{const k=d.toISOString().slice(0,10);return ex.filter(x=>x.date.slice(0,10)===k).reduce((a,x)=>a+Number(x.amount||0),0)});
+  const total=vals.reduce((a,b)=>a+b,0),peak=Math.max(0,...vals),peakIndex=vals.indexOf(peak);
+  const step=Math.max(1,Math.ceil(dates.length/14)),indices=dates.map((_,i)=>i).filter(i=>i%step===0||i===dates.length-1),mx=Math.max(1,...indices.map(i=>vals[i]));
+  $('trendCaption').textContent=caption;$('trendTotal').textContent=money(total);$('trendTotalLabel').textContent='Total spending';
+  $('mBars').innerHTML=indices.map(i=>{const d=dates[i],v=vals[i];return `<div class="barcol"><div class="bar ${v?(v/mx>.7?'warm':'cool'):''}" style="height:${Math.max(7,v/mx*100)}px"></div><div class="barlabel">${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div></div>`}).join('');
+  $('trendSummary').innerHTML=peak>0?`<span>${dates.length} days</span><span>Peak <strong>${money(peak)}</strong> · ${dates[peakIndex].toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>`:`<span>${dates.length} days</span><span>No spending in period</span>`;
+}
+
+function txHtml(arr){return arr.length?arr.map(x=>{const inc=x.type==='income',tr=x.type==='transfer',title=x.desc||(tr?'To '+x.person:x.cat)||'Transaction',meta=tr?[x.occasion,x.method]:[x.cat,inc?'Credited to '+(x.account||''):x.method],bg=inc?'#ebf8f0':tr?'#edf5ff':x.amount>2000?'#fff0ee':'#f1f4f7',date=x.date?new Date(x.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'Date unavailable';return `<div class="tx" style="border-left-color:${inc?'#12b76a':tr?'#53b1fd':x.amount>2000?'#ef4444':'#98a2b3'}"><div class="tx-icon" style="background:${bg}">${inc?'💰':tr?'🤝':iconFor(x.cat)}</div><div class="tx-info"><div class="tx-title">${esc(title)}</div><div class="tx-meta">${esc(meta.filter(Boolean).join(' · '))}</div><div class="tx-date">${esc(date)}</div></div><div class="tx-amount ${inc?'positive':tr?'tx-transfer':''}">${inc?'+':tr?'→':'−'} ${money(x.amount)}</div><button class="tx-menu" aria-label="Transaction options" onclick="openTxMenu('${x.id}')">⋯</button></div>`}).join(''):'<div class="empty">No transactions found.</div>'}
+function openTxMenu(id){const x=state.money.tx.find(t=>t.id===id);if(!x)return;app.editingTx=id;const title=x.desc||(x.type==='transfer'?'To '+x.person:x.cat)||'Transaction';$('txActionTitle').textContent=title;$('txActionMeta').textContent=x.date?new Date(x.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'';$('txActionModal').classList.add('show')}
+function editSelectedTransaction(){const id=app.editingTx;closeModal('txActionModal');if(id)openTransaction(id)}
+function deleteSelectedTransaction(){const id=app.editingTx;closeModal('txActionModal');if(id)askDelete('tx',id,'this transaction')}
+
+function iconFor(c){return state.money.cats.find(x=>x.name===c)?.icon||state.money.incomeCats.find(x=>x.name===c)?.icon||'💸'}
+function renderMoneyTransactions(){const q=($('mSearch')?.value||'').toLowerCase();const a=state.money.tx.filter(x=>(app.txFilter==='all'||x.type===app.txFilter)&&(x.desc+' '+(x.cat||'')+' '+(x.method||'')+' '+(x.person||'')+' '+(x.occasion||'')).toLowerCase().includes(q)).sort((a,b)=>new Date(b.date)-new Date(a.date));$('mTxList').innerHTML=txHtml(a);if(app.moneyPage==='home')$('mRecent').innerHTML=txHtml([...state.money.tx].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15))}
+function setMoneyFilter(f,b){app.txFilter=f;document.querySelectorAll('#mtransactions .filters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMoneyTransactions()}
+function renderMoneyAnalytics(){const m=monthTx().filter(x=>x.type==='expense'),t=m.reduce((s,x)=>s+x.amount,0);$('mAnTotal').textContent=money(t);let c={};m.forEach(x=>c[x.cat]=(c[x.cat]||0)+x.amount);$('mCats').innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin-top:13px"><div class="budget-top"><b>${esc(iconFor(k)+' '+k)}</b><span>${money(v)}</span></div><div class="progress" style="margin-top:7px"><i style="width:${v/Math.max(1,t)*100}%"></i></div></div>`).join('')||'<div class="empty">No spending yet.</div>';let p={};m.forEach(x=>p[x.method]=(p[x.method]||0)+x.amount);let mx=Math.max(1,...Object.values(p));$('mMethods').innerHTML=Object.entries(p).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="budget-row"><div class="budget-top"><b>${esc(k)}</b><span>${money(v)}</span></div><div class="progress" style="margin-top:7px"><i style="width:${v/mx*100}%"></i></div></div>`).join('')||'<div class="empty">No payment usage yet.</div>'}
+function renderBudgets(){let e=monthTx().filter(x=>x.type==='expense'),t=e.reduce((s,x)=>s+x.amount,0),o=state.money.budgets.overall||0,p=o?Math.min(100,t/o*100):0;$('budgetSpent').textContent=money(t);$('budgetLabel').textContent='of '+money(o);$('budgetBar').style.width=p+'%';$('budgetText').textContent=o?money(Math.max(0,o-t))+' remaining':'Set an overall monthly budget';let c={};e.forEach(x=>c[x.cat]=(c[x.cat]||0)+x.amount);$('budgetCats').innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{let b=state.money.budgets.categories[k]||0;return `<div class="card" style="margin-top:9px"><div class="budget-top"><b>${esc(iconFor(k)+' '+k)}</b><span>${money(v)}${b?' / '+money(b):' spent'}</span></div>${b?`<div class="progress" style="margin-top:8px"><i style="width:${Math.min(100,v/b*100)}%"></i></div>`:'<div class="small" style="margin-top:5px">No category budget</div>'}</div>`}).join('')||'<div class="empty">No category spending yet.</div>'}
+function openTransaction(id=null,forced=null){app.editingTx=id;renderTxOptions();const x=id&&state.money.tx.find(a=>a.id===id);$('txTitle').textContent=id?'Edit transaction':'Add transaction';$('fDate').value=x?.date?.slice(0,10)||today();$('tDate').value=x?.date?.slice(0,10)||today();$('fAmount').value=x?.amount||'';$('fDesc').value=x?.desc||'';$('fCat').value=x?.cat||'';$('fMethod').value=x?.method||'';$('fAccount').value=x?.account||state.money.incomeAccounts[0]?.name||'';$('tAmount').value=x?.amount||'';$('tPerson').value=x?.person||'';$('tOccasion').value=x?.occasion||'';$('tMethod').value=x?.method||state.money.methods[0]?.name||'';setTxType(forced||x?.type||'expense');$('txModal').classList.add('show')}
+function renderTxOptions(){$('fMethod').innerHTML=state.money.methods.map(x=>`<option>${esc(x.name)}</option>`).join('');$('tMethod').innerHTML=$('fMethod').innerHTML;$('fAccount').innerHTML=state.money.incomeAccounts.map(x=>`<option>${esc(x.name)}</option>`).join('')}
+function setTxType(t){app.txType=t;['te','ti','tt'].forEach(x=>$(x).classList.remove('sel'));({expense:'te',income:'ti',transfer:'tt'}[t]&&$({expense:'te',income:'ti',transfer:'tt'}[t]).classList.add('sel'));$('normalFields').style.display=t==='transfer'?'none':'block';$('transferFields').style.display=t==='transfer'?'block':'none';$('methodLabel').style.display=t==='income'?'none':'block';$('fMethod').style.display=t==='income'?'none':'block';$('accountLabel').style.display=t==='income'?'block':'none';$('fAccount').style.display=t==='income'?'block':'none';const cats=t==='income'?state.money.incomeCats:state.money.cats;$('fCat').innerHTML=cats.map(x=>`<option value="${esc(x.name)}">${esc(x.icon+' '+x.name)}</option>`).join('')}
+function saveTransaction(){let o;if(app.txType==='transfer'){let a=+$('tAmount').value,p=$('tPerson').value.trim();if(!a||!p||/^\d+$/.test(p))return alert('Enter a valid amount and person name.');o={id:app.editingTx||uid(),type:'transfer',amount:a,person:p,occasion:$('tOccasion').value.trim(),method:$('tMethod').value,date:new Date($('tDate').value+'T12:00:00').toISOString()}}else{let a=+$('fAmount').value,cat=$('fCat').value;if(!a||!cat)return alert('Amount and category are required.');o={id:app.editingTx||uid(),type:app.txType,amount:a,cat,method:app.txType==='income'?'':$('fMethod').value,account:app.txType==='income'?$('fAccount').value:'',date:new Date($('fDate').value+'T12:00:00').toISOString(),desc:$('fDesc').value.trim()};if(app.txType==='expense'&&!o.method)return alert('Payment method is required.')}if(app.editingTx)state.money.tx[state.money.tx.findIndex(x=>x.id===app.editingTx)]=o;else state.money.tx.push(o);snapshotWorth();closeModal('txModal');refresh()}
+function openCategory(id=null){app.editingCat=id;const c=id&&state.money.cats.find(x=>x.id===id);$('catTitle').textContent=id?'Edit category':'Add category';$('catName').value=c?.name||'';$('catIcon').value=c?.icon||'';$('categoryModal').classList.add('show')}
+function saveCategory(){let n=$('catName').value.trim();if(!n||!/[^\W\d_]/u.test(n))return alert('Enter a name containing at least one letter.');if(app.editingCat){let c=state.money.cats.find(x=>x.id===app.editingCat),old=c.name;c.name=n;c.icon=$('catIcon').value.trim()||'💸';state.money.tx.forEach(x=>{if(x.cat===old)x.cat=n})}else state.money.cats.push({id:uid(),name:n,icon:$('catIcon').value.trim()||'💸'});closeModal('categoryModal');refresh()}
+function deleteCategory(id){if(state.money.cats.length<=1)return alert('Keep one category.');const c=state.money.cats.find(x=>x.id===id),fb=state.money.cats.find(x=>x.id!==id)?.name;if(state.money.tx.some(x=>x.cat===c.name)){if(!confirm(`Move "${c.name}" transactions to "${fb}"?`))return;state.money.tx.forEach(x=>{if(x.cat===c.name)x.cat=fb})}else if(!confirm(`Delete "${c.name}"?`))return;state.money.cats=state.money.cats.filter(x=>x.id!==id);refresh()}
+
+function openMilestone(id=null){app.editingMilestone=id;let m=id&&state.wealth.milestones.find(x=>x.id===id);$('milestoneTitle').textContent=id?'Edit milestone':'Add milestone';$('msName').value=m?.name||'';$('msTarget').value=m?.target||'';$('msCurrent').value=m?.current||'';$('msDate').value=m?.date||'';$('milestoneModal').classList.add('show')}
+function saveMilestone(){let n=$('msName').value.trim(),target=+$('msTarget').value,current=+$('msCurrent').value||0;if(!n||!target||/^\d+$/.test(n)||target<=0)return alert('Enter a text goal name and target amount.');let old=app.editingMilestone&&state.wealth.milestones.find(x=>x.id===app.editingMilestone),o={id:app.editingMilestone||uid(),name:n,target,current:Math.min(current,target),date:$('msDate').value,status:old?.status||'open'};if(app.editingMilestone)state.wealth.milestones[state.wealth.milestones.findIndex(x=>x.id===app.editingMilestone)]=o;else state.wealth.milestones.push(o);closeModal('milestoneModal');refresh()}
+function deleteMilestone(id){askDelete('milestone',id,'this milestone')}
+function milestoneCards(limit=null){const arr=limit?state.wealth.milestones.slice(0,limit):state.wealth.milestones;return arr.length?arr.map(m=>{let p=Math.min(100,(m.current||0)/(m.target||1)*100),left=Math.max(0,m.target-(m.current||0));return `<div class="milestone"><div class="milestone-head"><div class="milestone-title">${esc(m.name)}</div><div class="milestone-amt">${p.toFixed(0)}%</div></div><div class="milestone-track"><i style="width:${p}%"></i></div><div class="milestone-foot"><span>${money(m.current||0)} / ${money(m.target)}</span><span>${left?money(left)+' left':'Completed'}</span></div><div class="actions"><button class="mini" onclick="openMilestone('${m.id}')">Edit</button><button class="mini danger" onclick="deleteMilestone('${m.id}')">Delete</button></div></div>`}).join(''):'<div class="empty">No milestones yet. Add a financial target.</div>'}
+function renderMilestones(){
+const box=$('wealthMilestones');if(!box)return;
+if(!state.wealth.milestones.length){box.innerHTML='<div class="empty">No milestones yet. Add one financial target.</div>';return}
+box.innerHTML=state.wealth.milestones.map(m=>{let p=Math.min(100,(m.current||0)/(m.target||1)*100);let left=Math.max(0,m.target-(m.current||0));return `<div class="milestone"><div class="milestone-head"><div class="milestone-title">${esc(m.name)}</div><div class="milestone-amt">${money(m.current||0)} / ${money(m.target)}</div></div><div class="milestone-track"><i style="width:${p}%"></i></div><div class="milestone-foot"><span>${p.toFixed(0)}% complete · ${money(left)} left</span><span>${m.date?'Target '+new Date(m.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'No target date'}</span></div><div class="actions"><button class="mini" onclick="openMilestone('${m.id}')">Edit</button><button class="mini danger" onclick="deleteMilestone('${m.id}')">Delete</button></div></div>`}).join('');
+}
+function renderMore(){
+  renderProfile();
+  const name=getProfileName();
+  $('profileNameLabel')?.replaceChildren(document.createTextNode(name));
+  $('wealthProfileNameLabel')?.replaceChildren(document.createTextNode(name));
+  $('mCatsManage').innerHTML=state.money.cats.map(c=>`<div class="manage-row"><b>${esc(c.icon+' '+c.name)}</b><span></span><button class="mini" onclick="openCategory('${c.id}')">Edit</button><button class="mini danger" onclick="deleteCategory('${c.id}')">Delete</button></div>`).join('');
+  $('mMethodsManage').innerHTML=state.money.methods.map(m=>`<div class="manage-row"><b>💳 ${esc(m.name)}</b><span>${esc(m.type)}</span><button class="mini" onclick="openMethod('${m.id}')">Edit</button><button class="mini danger" onclick="deleteMethod('${m.id}')">Delete</button></div>`).join('');
+  $('mIncomeManage').innerHTML=state.money.incomeAccounts.map(a=>`<div class="manage-row"><b>🏦 ${esc(a.name)}</b><span></span><button class="mini" onclick="openIncomeAccount('${a.id}')">Edit</button><button class="mini danger" onclick="deleteIncomeAccount('${a.id}')">Delete</button></div>`).join('');
+}
+function openMethod(id=null){app.editingMethod=id;const m=id&&state.money.methods.find(x=>x.id===id);$('methodTitle').textContent=id?'Edit payment method':'Add payment method';$('methodName').value=m?.name||'';$('methodType').value=m?.type||'Other';$('methodModal').classList.add('show')}
+function saveMethod(){let n=$('methodName').value.trim();if(!n||!/[^\W\d_]/u.test(n))return alert('Enter a name containing at least one letter.');if(app.editingMethod){let m=state.money.methods.find(x=>x.id===app.editingMethod),old=m.name;m.name=n;m.type=$('methodType').value;state.money.tx.forEach(x=>{if(x.method===old)x.method=n})}else state.money.methods.push({id:uid(),name:n,type:$('methodType').value});closeModal('methodModal');refresh()}
+function deleteMethod(id){if(state.money.methods.length<=1)return alert('Keep one payment method.');const m=state.money.methods.find(x=>x.id===id),fb=state.money.methods.find(x=>x.id!==id)?.name;if(state.money.tx.some(x=>x.method===m.name)){if(!confirm(`Move transactions from "${m.name}" to "${fb}"?`))return;state.money.tx.forEach(x=>{if(x.method===m.name)x.method=fb})}else if(!confirm(`Delete "${m.name}"?`))return;state.money.methods=state.money.methods.filter(x=>x.id!==id);refresh()}
+function openIncomeAccount(id=null){app.editingIncome=id;const a=id&&state.money.incomeAccounts.find(x=>x.id===id);$('incomeName').value=a?.name||'';$('incomeModal').classList.add('show')}
+function saveIncomeAccount(){let n=$('incomeName').value.trim();if(!n||!/[^\W\d_]/u.test(n))return alert('Enter a name containing at least one letter.');if(app.editingIncome){let a=state.money.incomeAccounts.find(x=>x.id===app.editingIncome),old=a.name;a.name=n;state.money.tx.forEach(x=>{if(x.account===old)x.account=n})}else state.money.incomeAccounts.push({id:uid(),name:n});closeModal('incomeModal');refresh()}
+function deleteIncomeAccount(id){if(state.money.incomeAccounts.length<=1)return alert('Keep one income account.');state.money.incomeAccounts=state.money.incomeAccounts.filter(x=>x.id!==id);refresh()}
+function openBudget(){$('overallBudgetInput').value=state.money.budgets.overall||'';$('budgetEdit').innerHTML=state.money.cats.map(c=>`<label>${esc(c.icon+' '+c.name)}</label><input id="b_${c.id}" type="number" inputmode="decimal" min="0" step="100" value="${state.money.budgets.categories[c.name]||''}" placeholder="No category budget">`).join('');$('budgetModal').classList.add('show')}
+function saveBudgets(){state.money.budgets.overall=+$('overallBudgetInput').value||0;state.money.cats.forEach(c=>{let v=+$('b_'+c.id).value||0;if(v)state.money.budgets.categories[c.name]=v;else delete state.money.budgets.categories[c.name]});closeModal('budgetModal');refresh()}
+
+function wealthCalc(){const mfs=state.wealth.mfs.reduce((s,x)=>s+x.value,0),stocks=state.wealth.stocks.reduce((s,x)=>s+x.value,0),fds=state.wealth.fds.reduce((s,x)=>s+(x.value||x.principal),0),other=state.wealth.assets.reduce((s,x)=>s+x.value,0),epfo=state.wealth.epfo.balance;const income=state.money.tx.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),expense=state.money.tx.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0),transfer=state.money.tx.filter(x=>x.type==='transfer').reduce((s,x)=>s+x.amount,0),cash=Math.max(0,income-expense-transfer);const assets=cash+mfs+stocks+fds+other+epfo,liab=state.wealth.loans.reduce((s,x)=>s+x.outstanding,0),lend=state.wealth.debts.filter(x=>x.type==='lend'&&x.status==='open').reduce((s,x)=>s+x.remaining,0),borrow=state.wealth.debts.filter(x=>x.type==='borrow'&&x.status==='open').reduce((s,x)=>s+x.remaining,0);return{assets,liab,lend,borrow,net:assets-liab+lend-borrow,cash,mfs,stocks,fds,other,epfo}}
+function snapshotWorth(){const w=wealthCalc(),last=state.wealth.history.at(-1);if(!last||last.net!==w.net||last.assets!==w.assets||last.liabilities!==w.liab)state.wealth.history.push({date:new Date().toISOString(),net:w.net,assets:w.assets,liabilities:w.liab})}
+function renderWealth(){const w=wealthCalc();$('wNetWorth').textContent=money(w.net);$('wAssets').textContent=money(w.assets);$('wLiab').textContent=money(w.liab);$('wLend').textContent=money(w.lend);$('wBorrow').textContent=money(w.borrow);$('wDelta').textContent=`${money(w.assets)} assets · ${money(w.liab)} liabilities`;const g=[['Money balance estimate',w.cash,'#6f7d93'],['FDs',w.fds,'#e58b36'],['Mutual funds',w.mfs,'#315d87'],['Stocks / ETFs',w.stocks,'#7957c7'],['EPFO',w.epfo,'#1b9870'],['Other assets',w.other,'#b47a22']].filter(x=>x[1]>0),sum=Math.max(1,g.reduce((s,x)=>s+x[1],0));$('wMix').innerHTML=g.map(x=>`<i class="piece" style="width:${x[1]/sum*100}%;background:${x[2]}"></i>`).join('');$('wLegend').innerHTML=g.map(x=>`<div><span class="dot" style="background:${x[2]}"></span>${esc(x[0])} · ${money(x[1])}</div>`).join('')||'<div class="small">Add wealth records.</div>';
+$('wAssetPreview').innerHTML=g.slice().reverse().slice(0,5).map(x=>`<div class="asset"><div class="asset-head"><div class="asset-name">${esc(x[0])}</div><div class="asset-value">${money(x[1])}</div></div></div>`).join('')||'<div class="empty">No assets yet.</div>';if($('wdLend'))$('wdLend').textContent=money(w.lend);if($('wdBorrow'))$('wdBorrow').textContent=money(w.borrow);
+$('wLiabPreview').innerHTML=state.wealth.loans.slice(0,3).map(l=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">🏦 ${esc(l.name)}</div><div class="asset-sub">EMI ${money(l.emi)} · ${l.paid||0}/${l.tenure||'?'} paid</div></div><div class="asset-value">${money(l.outstanding)}</div></div></div>`).join('')||'<div class="empty">No loans yet.</div>';
+$('wDebtPreview').innerHTML=state.wealth.debts.filter(d=>d.status==='open').slice(0,3).map(d=>`<div class="debt"><div class="debt-head"><div class="debt-person">${esc(d.person)}</div><span class="status">${d.type==='lend'?'They owe you':'You owe them'}</span></div><div class="debt-amount ${d.type==='lend'?'lend':'borrow'}">${money(d.remaining)}</div></div>`).join('')||'<div class="empty">No open money owed.</div>';
+renderNetworth();renderWealthActivity();renderWealthAnalytics();renderDebts();renderMilestones();
+const mp=$('wMilestonePreview');if(mp)mp.innerHTML=milestoneCards(2);
+const bp=$('wealthBudgetMilestones');if(bp)bp.innerHTML=milestoneCards();
+const active=state.wealth.milestones.filter(m=>(m.current||0)<(m.target||0));const totalTarget=active.reduce((a,m)=>a+Number(m.target||0),0),totalCurrent=active.reduce((a,m)=>a+Math.min(Number(m.current||0),Number(m.target||0)),0);if($('wGoalCount'))$('wGoalCount').textContent=active.length;if($('wGoalProgress'))$('wGoalProgress').textContent=(totalTarget?Math.round(totalCurrent/totalTarget*100):0)+'%';
+}
+function renderNetworth(){const w=wealthCalc();$('nwTotal').textContent=money(w.net);$('fdList').innerHTML=state.wealth.fds.map(f=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">🏧 ${esc(f.bank)} FD</div><div class="asset-sub">Principal ${money(f.principal)}${f.rate?' · '+f.rate+'%':''}${f.maturity?' · Matures '+new Date(f.maturity).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):''}</div></div><div class="asset-value">${money(f.value||f.principal)}</div></div><div class="actions"><button class="mini" onclick="openFd('${f.id}')">Edit</button><button class="mini danger" onclick="deleteFd('${f.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No FDs yet.</div>';
+$('mfList').innerHTML=state.wealth.mfs.map(m=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">📈 ${esc(m.name)}</div><div class="asset-sub">Invested ${money(m.invested)} · Gain ${money(m.value-(m.invested||0))}</div></div><div class="asset-value">${money(m.value)}</div></div><div class="actions"><button class="mini" onclick="openMf('${m.id}')">Edit</button><button class="mini danger" onclick="deleteMf('${m.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No mutual funds yet.</div>';
+$('stockList').innerHTML=state.wealth.stocks.map(s=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">📊 ${esc(s.name)}</div><div class="asset-sub">${s.qty?s.qty+' units · ':''}${s.avg?'Avg '+money(s.avg)+' · ':''}${s.price?'Now '+money(s.price):''}</div></div><div class="asset-value">${money(s.value)}</div></div><div class="actions"><button class="mini" onclick="openStock('${s.id}')">Edit</button><button class="mini danger" onclick="deleteStock('${s.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No stocks or ETFs yet.</div>';
+$('epfoCard').innerHTML=`<div class="budget-top"><b>Current balance</b><span>${money(state.wealth.epfo.balance)}</span></div><div class="small" style="margin-top:5px">Expected monthly contribution ${money(state.wealth.epfo.contribution)} · Updated ${new Date(state.wealth.epfo.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>`;
+$('loanList').innerHTML=state.wealth.loans.map(l=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">🏦 ${esc(l.name)}</div><div class="asset-sub">EMI ${money(l.emi)} · ${l.paid||0}/${l.tenure||'?'} paid${l.next?' · Next '+new Date(l.next).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):''}</div></div><div class="asset-value">${money(l.outstanding)}</div></div><div class="actions"><button class="mini" onclick="recordLoanEmi('${l.id}')">Pay EMI</button><button class="mini" onclick="openLoan('${l.id}')">Edit</button><button class="mini danger" onclick="deleteLoan('${l.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No loans yet.</div>';
+$('otherAssetList').innerHTML=state.wealth.assets.map(a=>`<div class="asset"><div class="asset-head"><div><div class="asset-name">🏠 ${esc(a.name)}</div><div class="asset-sub">${esc(a.type)} · Updated ${new Date(a.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div class="asset-value">${money(a.value)}</div></div><div class="actions"><button class="mini" onclick="openAsset('${a.id}')">Edit</button><button class="mini danger" onclick="deleteAsset('${a.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No other assets yet.</div>';
+$('worthHistory').innerHTML=state.wealth.history.length?[...state.wealth.history].slice(-10).reverse().map(h=>`<div class="history-row"><b>${new Date(h.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</b><span>${money(h.net)}</span></div>`).join(''):'<div class="small">Snapshots appear after wealth updates.</div>'}
+function renderWealthActivity(){let rows=[];state.wealth.fds.forEach(x=>rows.push(['🏧',x.bank+' FD','Fixed deposit',x.value||x.principal,'#e58b36']));state.wealth.mfs.forEach(x=>rows.push(['📈',x.name,'Mutual fund',x.value,'#315d87']));state.wealth.stocks.forEach(x=>rows.push(['📊',x.name,'Stock / ETF',x.value,'#7957c7']));state.wealth.loans.forEach(x=>rows.push(['🏦',x.name,'Loan outstanding',-x.outstanding,'#c4322b']));rows.push(['🏢','EPFO','Retirement',state.wealth.epfo.balance,'#1b9870']);state.wealth.assets.forEach(x=>rows.push(['🏠',x.name,x.type,x.value,'#b47a22']));state.wealth.debts.filter(x=>x.status==='open').forEach(x=>rows.push(['🤝',x.person,x.type==='lend'?'Owed to you':'You owe',x.type==='lend'?x.remaining:-x.remaining,x.type==='lend'?'#16734a':'#c4322b']));$('wealthActivity').innerHTML=rows.length?rows.map(r=>`<div class="budget-row"><div class="budget-top"><b>${r[0]} ${esc(r[1])}</b><span style="font-weight:830;color:${r[4]}">${r[3]<0?'− ':'+'}${money(Math.abs(r[3]))}</span></div><div class="small">${esc(r[2])}</div></div>`).join(''):'<div class="empty">No Wealth records.</div>'}
+function renderWealthAnalytics(){
+  const w=wealthCalc();
+  $('waNet').textContent=money(w.net);
+  if($('waAssets'))$('waAssets').textContent=money(w.assets);
+  if($('waLiab'))$('waLiab').textContent=money(w.liab);
+  if($('waLend'))$('waLend').textContent=money(w.lend);
+  if($('waBorrow'))$('waBorrow').textContent=money(w.borrow);
+  const arr=[['Fixed deposits',w.fds,'#e58b36','FD'],['Mutual funds',w.mfs,'#315d87','MF'],['Stocks / ETFs',w.stocks,'#7957c7','ST'],['EPFO',w.epfo,'#1b9870','EP'],['Other assets',w.other,'#b47a22','OT'],['Money balance',w.cash,'#7b8798','CA']].filter(x=>x[1]>0);
+  const total=Math.max(1,arr.reduce((a,x)=>a+x[1],0));
+  if($('waAllocTotal'))$('waAllocTotal').textContent=money(total);
+  $('waAlloc').innerHTML=arr.length?arr.map(x=>{const pct=x[1]/total*100;return `<div class="wealth-alloc-row"><div class="wealth-alloc-icon">${x[3]}</div><div class="wealth-alloc-main"><div class="wealth-alloc-top"><b>${esc(x[0])}</b><span>${money(x[1])} · ${pct.toFixed(0)}%</span></div><div class="wealth-alloc-track"><i style="width:${pct}%;background:${x[2]}"></i></div></div></div>`}).join(''):'<div class="empty">Add a wealth record to see allocation.</div>';
+  $('waBreak').innerHTML=[['Assets',w.assets,'Positive'],['Liabilities',w.liab,'Debt'],['Receivable',w.lend,'Money owed to you'],['Payable',w.borrow,'Money you owe']].map(x=>`<div class="wealth-break-row"><div><b>${x[0]}</b><span>${x[2]}</span></div><strong>${money(x[1])}</strong></div>`).join('');
+}
+function renderDebts(){$('debtList').innerHTML=state.wealth.debts.length?state.wealth.debts.map(d=>`<div class="debt"><div class="debt-head"><div><div class="debt-person">${esc(d.person)}</div><div class="small">${esc(d.reason||'No reason')}${d.due?' · Due '+new Date(d.due).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):''}</div></div><span class="status">${d.status==='open'?(d.type==='lend'?'They owe you':'You owe them'):'Settled'}</span></div><div class="debt-amount ${d.type==='lend'?'lend':'borrow'}">${money(d.remaining)}</div>${d.status==='open'?`<div class="actions"><button class="mini" onclick="openRepay('${d.id}')">Record repayment</button><button class="mini" onclick="openDebt('${d.id}')">Edit</button><button class="mini danger" onclick="deleteDebt('${d.id}')">Delete</button></div>`:'<div class="small">Fully settled.</div>'}${d.repayments?.length?`<div class="small" style="margin-top:8px">Repayments: ${d.repayments.map(r=>money(r.amount)).join(' · ')}</div>`:''}</div>`).join(''):'<div class="empty">Nothing owed.</div>'}
+function openDebt(id=null){app.editingDebt=id;let d=id&&state.wealth.debts.find(x=>x.id===id);$('debtTitle').textContent=id?'Edit money owed':'Add money owed';$('dPerson').value=d?.person||'';$('dAmount').value=d?.remaining??d?.amount??'';$('dReason').value=d?.reason||'';$('dDue').value=d?.due||'';$('dNote').value=d?.note||'';setDebtType(d?.type||'lend');$('debtModal').classList.add('show')}
+function setDebtType(t){app.debtType=t;$('lendType').classList.toggle('sel',t==='lend');$('borrowType').classList.toggle('sel',t==='borrow')}
+function saveDebt(){let p=$('dPerson').value.trim(),a=+$('dAmount').value;if(!p||/^\d+$/.test(p)||!a||a<=0)return alert('Enter a valid person name and amount.');let old=app.editingDebt&&state.wealth.debts.find(x=>x.id===app.editingDebt),o={id:app.editingDebt||uid(),type:app.debtType,person:p,amount:old?.amount||a,remaining:app.editingDebt?Math.min(a,old.amount):a,reason:$('dReason').value.trim(),due:$('dDue').value,note:$('dNote').value.trim(),status:app.editingDebt&&a<=0?'settled':(old?.status||'open'),repayments:old?.repayments||[]};if(app.editingDebt)state.wealth.debts[state.wealth.debts.findIndex(x=>x.id===app.editingDebt)]=o;else state.wealth.debts.push(o);snapshotWorth();closeModal('debtModal');refresh()}
+function openRepay(id){const d=state.wealth.debts.find(x=>x.id===id);app.editingRepay=id;$('repaySummary').innerHTML=`<b>${esc(d.person)}</b><div class="small">${d.type==='lend'?'They owe you':'You owe them'} · Remaining ${money(d.remaining)}</div>`;$('repayAmount').value='';$('repayDate').value=today();$('repayModal').classList.add('show')}
+function saveRepayment(){const d=state.wealth.debts.find(x=>x.id===app.editingRepay),a=+$('repayAmount').value;if(!d||!a||a<=0)return alert('Enter a valid repayment.');if(a>d.remaining)return alert('Repayment cannot exceed the remaining amount.');d.remaining-=a;d.status=d.remaining<=0?'settled':'open';d.repayments??=[];d.repayments.push({amount:a,date:$('repayDate').value});snapshotWorth();closeModal('repayModal');refresh()}
+function deleteDebt(id){if(confirm('Delete this money-owed record?')){state.wealth.debts=state.wealth.debts.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function openEpfo(){$('eBalance').value=state.wealth.epfo.balance||'';$('eContribution').value=state.wealth.epfo.contribution||'';$('eDate').value=state.wealth.epfo.date||today();$('epfoModal').classList.add('show')}
+function saveEpfo(){state.wealth.epfo={balance:+$('eBalance').value||0,contribution:+$('eContribution').value||0,date:$('eDate').value||today()};snapshotWorth();closeModal('epfoModal');refresh()}
+function openMf(id=null){app.editingMf=id;let m=id&&state.wealth.mfs.find(x=>x.id===id);$('mfTitle').textContent=id?'Edit mutual fund':'Add mutual fund';$('mfName').value=m?.name||'';$('mfInvested').value=m?.invested||'';$('mfValue').value=m?.value||'';$('mfUnits').value=m?.units||'';$('mfDate').value=m?.date||today();$('mfModal').classList.add('show')}
+function saveMf(){let n=$('mfName').value.trim(),v=+$('mfValue').value;if(!n||/^\d+$/.test(n)||!v)return alert('Enter a text fund name and current value.');let o={id:app.editingMf||uid(),name:n,invested:+$('mfInvested').value||0,value:v,units:+$('mfUnits').value||0,date:$('mfDate').value};if(app.editingMf)state.wealth.mfs[state.wealth.mfs.findIndex(x=>x.id===app.editingMf)]=o;else state.wealth.mfs.push(o);snapshotWorth();closeModal('mfModal');refresh()}
+function deleteMf(id){if(confirm('Delete this mutual fund?')){state.wealth.mfs=state.wealth.mfs.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function openFd(id=null){app.editingFd=id;let f=id&&state.wealth.fds.find(x=>x.id===id);$('fdTitle').textContent=id?'Edit fixed deposit':'Add fixed deposit';$('fdBank').value=f?.bank||'';$('fdPrincipal').value=f?.principal||'';$('fdRate').value=f?.rate||'';$('fdValue').value=f?.value||f?.principal||'';$('fdStart').value=f?.start||'';$('fdMaturity').value=f?.maturity||'';$('fdModal').classList.add('show')}
+function saveFd(){let b=$('fdBank').value.trim(),p=+$('fdPrincipal').value;if(!b||/^\d+$/.test(b)||!p)return alert('Enter a text bank name and principal.');let o={id:app.editingFd||uid(),bank:b,principal:p,rate:+$('fdRate').value||0,value:+$('fdValue').value||p,start:$('fdStart').value,maturity:$('fdMaturity').value};if(app.editingFd)state.wealth.fds[state.wealth.fds.findIndex(x=>x.id===app.editingFd)]=o;else state.wealth.fds.push(o);snapshotWorth();closeModal('fdModal');refresh()}
+function deleteFd(id){if(confirm('Delete this FD?')){state.wealth.fds=state.wealth.fds.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function openStock(id=null){app.editingStock=id;let s=id&&state.wealth.stocks.find(x=>x.id===id);$('stockTitle').textContent=id?'Edit stock / ETF':'Add stock / ETF';$('stockName').value=s?.name||'';$('stockQty').value=s?.qty||'';$('stockAvg').value=s?.avg||'';$('stockPrice').value=s?.price||'';$('stockValue').value=s?.value||'';$('stockDate').value=s?.date||today();$('stockModal').classList.add('show')}
+function saveStock(){let n=$('stockName').value.trim(),v=+$('stockValue').value;if(!n||/^\d+$/.test(n)||!v)return alert('Enter a text stock/ETF name and current value.');let o={id:app.editingStock||uid(),name:n,qty:+$('stockQty').value||0,avg:+$('stockAvg').value||0,price:+$('stockPrice').value||0,value:v,date:$('stockDate').value};if(app.editingStock)state.wealth.stocks[state.wealth.stocks.findIndex(x=>x.id===app.editingStock)]=o;else state.wealth.stocks.push(o);snapshotWorth();closeModal('stockModal');refresh()}
+function deleteStock(id){if(confirm('Delete this stock / ETF?')){state.wealth.stocks=state.wealth.stocks.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function openLoan(id=null){app.editingLoan=id;let l=id&&state.wealth.loans.find(x=>x.id===id);$('loanTitle').textContent=id?'Edit loan':'Add loan';$('loanName').value=l?.name||'';$('loanOutstanding').value=l?.outstanding||'';$('loanEmi').value=l?.emi||'';$('loanRate').value=l?.rate||'';$('loanTenure').value=l?.tenure||'';$('loanPaid').value=l?.paid||'';$('loanNext').value=l?.next||'';$('loanModal').classList.add('show')}
+function saveLoan(){let n=$('loanName').value.trim(),o=+$('loanOutstanding').value;if(!n||/^\d+$/.test(n)||!o)return alert('Enter a text loan name and balance.');let x={id:app.editingLoan||uid(),name:n,outstanding:o,emi:+$('loanEmi').value||0,rate:+$('loanRate').value||0,tenure:+$('loanTenure').value||0,paid:+$('loanPaid').value||0,next:$('loanNext').value};if(app.editingLoan)state.wealth.loans[state.wealth.loans.findIndex(x=>x.id===app.editingLoan)]=x;else state.wealth.loans.push(x);snapshotWorth();closeModal('loanModal');refresh()}
+function recordLoanEmi(id){const l=state.wealth.loans.find(x=>x.id===id);if(!l)return;const amount=Number(l.emi||0);if(!amount)return alert('Set the EMI amount first.');l.outstanding=Math.max(0,Number(l.outstanding||0)-amount);l.paid=Number(l.paid||0)+1;if(l.tenure&&l.paid>l.tenure)l.paid=l.tenure;snapshotWorth();refresh()}
+function deleteLoan(id){if(confirm('Delete this loan?')){state.wealth.loans=state.wealth.loans.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function openAsset(id=null){app.editingAsset=id;let a=id&&state.wealth.assets.find(x=>x.id===id);$('assetTitle').textContent=id?'Edit other asset':'Add other asset';$('assetName').value=a?.name||'';$('assetType').value=a?.type||'Other';$('assetValue').value=a?.value||'';$('assetDate').value=a?.date||today();$('assetModal').classList.add('show')}
+function saveAsset(){let n=$('assetName').value.trim(),v=+$('assetValue').value;if(!n||/^\d+$/.test(n)||!v)return alert('Enter a text asset name and value.');let x={id:app.editingAsset||uid(),name:n,type:$('assetType').value,value:v,date:$('assetDate').value};if(app.editingAsset)state.wealth.assets[state.wealth.assets.findIndex(x=>x.id===app.editingAsset)]=x;else state.wealth.assets.push(x);snapshotWorth();closeModal('assetModal');refresh()}
+function deleteAsset(id){if(confirm('Delete this asset?')){state.wealth.assets=state.wealth.assets.filter(x=>x.id!==id);snapshotWorth();refresh()}}
+function getProfileName(){return localStorage.getItem(PROFILE_KEY+'_name')||localStorage.getItem('spend_tracker_profiles_v12_name')||localStorage.getItem('spend_tracker_profile_v16_name')||'Default'}
+function getProfileEmail(){return localStorage.getItem(PROFILE_KEY+'_email')||''}
+function profileInitials(name){const n=String(name||'Default').trim();if(!n)return 'A';return n.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'A'}
+function renderProfile(){const name=getProfileName(),email=getProfileEmail();['profileNameInput','wealthProfileNameInput'].forEach(id=>{const e=$(id);if(e)e.value=name==='Default'?'':name});['profileEmailInput','wealthProfileEmailInput'].forEach(id=>{const e=$(id);if(e)e.value=email});['profileAvatar','wealthProfileAvatar'].forEach(id=>{const e=$(id);if(e)e.textContent=profileInitials(name)});$('profileNameLabel')?.replaceChildren(document.createTextNode(name));$('wealthProfileNameLabel')?.replaceChildren(document.createTextNode(name))}
+function saveProfile(){const nameEl=app.mode==='wealth'?$('wealthProfileNameInput'):$('profileNameInput'),emailEl=app.mode==='wealth'?$('wealthProfileEmailInput'):$('profileEmailInput');const n=(nameEl?.value||'').trim();const e=(emailEl?.value||'').trim();if(!n)return alert('Enter your name.');if(e&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))return alert('Enter a valid email address.');localStorage.setItem(PROFILE_KEY+'_name',n);localStorage.setItem(PROFILE_KEY+'_email',e);renderMore();alert('Profile saved.')}
+function renameProfile(){const n=prompt('Profile name',getProfileName());if(n&&n.trim()){localStorage.setItem(PROFILE_KEY+'_name',n.trim());renderMore()}}
+function resetProfile(){if(!confirm('Delete all current Money and Wealth data? This cannot be undone from the app.'))return;localStorage.removeItem(KEY);localStorage.removeItem(PROFILE_KEY+'_name');localStorage.removeItem(PROFILE_KEY+'_email');location.reload()}
+function backupPayload(){return {format:'Spend Tracker Backup',version:'18.1',schema:'spend-tracker-v18.1',exportedAt:new Date().toISOString(),profile:{name:getProfileName(),email:getProfileEmail()},data:state}}
+function backupBlob(){return new Blob([JSON.stringify(backupPayload(),null,2)],{type:'application/json'})}
+function openBackupDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window))return reject(new Error('IndexedDB unavailable'));const r=indexedDB.open(BACKUP_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('meta'))r.result.createObjectStore('meta')};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('DB error'))})}
+async function getBackupHandle(){try{const db=await openBackupDb();return await new Promise((resolve,reject)=>{const t=db.transaction('meta','readonly'),q=t.objectStore('meta').get('fileHandle');q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error)})}catch(e){return null}}
+async function setBackupHandle(handle){try{const db=await openBackupDb();await new Promise((resolve,reject)=>{const t=db.transaction('meta','readwrite');t.objectStore('meta').put(handle,'fileHandle');t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}catch(e){}}
+async function clearBackupHandle(){try{const db=await openBackupDb();await new Promise((resolve,reject)=>{const t=db.transaction('meta','readwrite');t.objectStore('meta').delete('fileHandle');t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}catch(e){}}
+async function writeHandle(handle,blob){if(handle.queryPermission){let p=await handle.queryPermission({mode:'readwrite'});if(p!=='granted')p=await handle.requestPermission({mode:'readwrite'});if(p!=='granted')throw new Error('permission')}const w=await handle.createWritable();await w.write(blob);await w.close()}
+async function backupData(){const blob=backupBlob(),safe=(getProfileName()||'profile').replace(/[^a-z0-9_-]+/gi,'-').toLowerCase(),filename='spend-tracker-'+safe+'-backup.json';let h=await getBackupHandle();if(h){try{await writeHandle(h,blob);alert('Backup updated.');return}catch(e){await clearBackupHandle()}}try{if(window.showSaveFilePicker){h=await window.showSaveFilePicker({suggestedName:filename,types:[{description:'Spend Tracker backup',accept:{'application/json':['.json']}}]});await writeHandle(h,blob);await setBackupHandle(h);alert('Backup saved. Future backups will update this same file.');return}}catch(e){if(e?.name==='AbortError')return}
+if(navigator.share&&typeof File!=='undefined'){try{await navigator.share({title:'Spend Tracker backup',text:'Spend Tracker backup file',files:[new File([blob],filename,{type:'application/json'})]});return}catch(e){if(e?.name==='AbortError')return}}
+const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);alert('Backup file created. Use Share to send it to Drive.')}
+function exportData(){backupData()}
+function readBackup(callback){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=()=>{const f=i.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const raw=JSON.parse(r.result),x=raw?.data||raw;if(!x?.money||!x?.wealth)throw new Error('shape');callback(x,raw)}catch(e){alert('Invalid Spend Tracker backup file.')}};r.readAsText(f)};i.click()}
+function importData(){readBackup((x,raw)=>{if(!confirm('Restore this backup and replace the current Money + Wealth data?'))return;state=x;if(raw?.profile){const pn=typeof raw.profile==='object'?raw.profile.name:raw.profile;const pe=typeof raw.profile==='object'?(raw.profile.email||''):'';if(pn)localStorage.setItem(PROFILE_KEY+'_name',String(pn));if(pe)localStorage.setItem(PROFILE_KEY+'_email',String(pe))}state.money??={tx:[],cats:[],incomeCats:[],methods:[],incomeAccounts:[],budgets:{overall:0,categories:{}}};state.money.budgets??={overall:0,categories:{}};state.wealth??={debts:[],assets:[],mfs:[],fds:[],stocks:[],loans:[],epfo:{balance:0,contribution:0,date:today()},history:[],milestones:[]};state.themeMode??='manual';state.textScale??='normal';save();refresh();alert('Backup restored successfully.')})}
+function mergeById(current,incoming){const out=[...(current||[])],index=new Map(out.map((x,i)=>[x.id,i]));for(const x of (incoming||[])){if(x?.id&&index.has(x.id))out[index.get(x.id)]=x;else out.push(x)}return out}
+function mergeByName(current,incoming){const out=[...(current||[])],index=new Map(out.map((x,i)=>[String(x.name||'').toLowerCase(),i]));for(const x of (incoming||[])){const k=String(x.name||'').toLowerCase();if(k&&index.has(k))out[index.get(k)]={...out[index.get(k)],...x};else out.push(x)}return out}
+function mergeHistory(current,incoming){const out=[...(current||[])],seen=new Set(out.map(x=>`${x.date}|${x.net}|${x.assets}|${x.liabilities}`));for(const x of (incoming||[])){const k=`${x.date}|${x.net}|${x.assets}|${x.liabilities}`;if(!seen.has(k)){out.push(x);seen.add(k)}}return out}
+function mergeData(){readBackup((x,raw)=>{if(!confirm('Merge this backup into the current data? Existing records stay unless the same ID is present.'))return;state.money.tx=mergeById(state.money.tx,x.money.tx);state.money.cats=mergeByName(state.money.cats,x.money.cats);state.money.incomeCats=mergeByName(state.money.incomeCats,x.money.incomeCats);state.money.methods=mergeByName(state.money.methods,x.money.methods);state.money.incomeAccounts=mergeByName(state.money.incomeAccounts,x.money.incomeAccounts);state.money.budgets.categories={...(state.money.budgets.categories||{}),...(x.money.budgets?.categories||{})};if(Number(x.money.budgets?.overall||0)>Number(state.money.budgets?.overall||0))state.money.budgets.overall=x.money.budgets.overall;state.wealth.debts=mergeById(state.wealth.debts,x.wealth.debts);state.wealth.assets=mergeById(state.wealth.assets,x.wealth.assets);state.wealth.mfs=mergeById(state.wealth.mfs,x.wealth.mfs);state.wealth.fds=mergeById(state.wealth.fds,x.wealth.fds);state.wealth.stocks=mergeById(state.wealth.stocks,x.wealth.stocks);state.wealth.loans=mergeById(state.wealth.loans,x.wealth.loans);state.wealth.milestones=mergeById(state.wealth.milestones,x.wealth.milestones);state.wealth.history=mergeHistory(state.wealth.history,x.wealth.history);if(raw?.profile&&!localStorage.getItem(PROFILE_KEY+'_name')){const pn=typeof raw.profile==='object'?raw.profile.name:raw.profile,pe=typeof raw.profile==='object'?(raw.profile.email||''):'';if(pn)localStorage.setItem(PROFILE_KEY+'_name',String(pn));if(pe)localStorage.setItem(PROFILE_KEY+'_email',String(pe))}if(x.wealth.epfo&&(x.wealth.epfo.balance||x.wealth.epfo.contribution))state.wealth.epfo=x.wealth.epfo;if(x.dark!==undefined)state.dark=x.dark;if(x.themeMode)state.themeMode=x.themeMode;if(x.textScale)state.textScale=x.textScale;save();refresh();alert('Backup merged successfully.')})}
+function exportCSV(){const rows=[['Date','Type','Description/Person','Category/Occasion','Payment Method','Income Account','Amount'],...state.money.tx.map(x=>[x.date,x.type,x.desc||x.person,x.cat||x.occasion,x.method,x.account,x.amount])],b=new Blob([rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n')],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='spend-tracker-money.csv';document.body.appendChild(a);a.click();a.remove()}
+
+snapshotWorth();refresh();
+
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;$('installApp')?.classList.add('show')});
+async function installPwa(){if(!deferredInstallPrompt){alert('Install is available when this app is opened from HTTPS or localhost.');return}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installApp')?.classList.remove('show')}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+if(state.themeMode==='auto'&&window.matchMedia){const mq=window.matchMedia('(prefers-color-scheme: dark)');const apply=()=>{state.dark=mq.matches;renderTheme()};mq.addEventListener?.('change',apply)}
+</script>
+<button id="installApp" class="install-app" onclick="installPwa()">＋ Install app</button><div id="deleteModal" class="modal"><div class="sheet"><div class="handle"></div>
+<div class="sheet-head"><h2>Delete entry?</h2><button class="close" onclick="closeDelete()">✕</button></div>
+<div class="small" id="deleteMessage">This entry will be removed and totals recalculated.</div>
+<div class="savebar"><button class="secondary" onclick="closeDelete()">Cancel</button><button class="primary delete-btn" onclick="confirmDelete()">Delete</button></div>
+</div></div>\n<script>
+/* V19.03 Personal Edition: global adaptive personality layer */
+(function(){
+const PERSONAL_KEY='spend_tracker_personalization_v1';
+const PHOTO_KEY='spend_tracker_profile_photo_v1';
+const lib={
+ funny:[
+  'Wallet behaving today. Suspicious. 👀','Money went somewhere. Naturally, it refuses to explain. 😂','Financial chaos, now neatly documented.','Your wallet has entered the chat.','Numbers don’t judge. They merely expose.','Another day, another tiny attack on the bank balance.','At least the app knows where the money went.','Budget: a polite suggestion you occasionally ignore.','Your future self requested fewer plot twists.','Spending detected. Humanity continues.','Money is temporary. Screenshots are forever.','That purchase looked smaller in your head, didn’t it?','Your wallet would like a quiet weekend.','Responsible today. Let’s not get carried away.','The numbers are numbering.','Financial detective mode: activated. 🕵️','Your bank account has entered character development.','₹ here, ₹ there, and suddenly we have a documentary.','You tracked it. That already makes it official.','The budget has seen things.','A little discipline, a little chaos. Balanced.','Your money has better attendance than most meetings.','Spending report: brutally honest, as requested.','Nothing to see here. Except the transactions.','Money does not disappear. It relocates aggressively.','Today’s financial plot thickens.','The wallet survives another episode.','At least the math is honest.','Your expenses are developing lore.','Another receipt for the museum. 😂'
+ ],
+ money:[
+  'Money mode: let’s keep the chaos measurable.','Every rupee gets a job. Even the suspicious ones.','Your spending story, minus the dramatic music.','Small leaks sink budgets. Good thing we have receipts.','Track first. Panic later.','The goal is clarity, not financial perfection.','A clean ledger is a beautiful thing.','Today’s numbers are ready for inspection.','Your money deserves better records.','One transaction at a time.','Less guessing. More knowing.','Money looks calmer when it is organised.','The dashboard is awake.','Receipts in. Excuses out.','Financial housekeeping, but make it useful.'
+ ],
+ wealth:[
+  'Future-you is quietly taking notes. 📈','Slowly building the empire.','Wealth is boring until it compounds.','Net worth: the long game scoreboard.','Let the assets do some of the heavy lifting.','Future-you likes boring consistency.','Compounding is basically patience with receipts.','A little more today, a little more later.','Wealth mode: fewer fireworks, more foundations.','Your future balance sheet is watching.','Build. Track. Repeat.','The long game has entered the chat.','Assets up, excuses down.','Quiet progress is still progress.','Good wealth habits rarely make exciting headlines. That is the point.'
+ ],
+ facts:[
+  'Tiny fact: compound growth rewards time more than drama. 🧠','Tiny fact: tracking spending makes invisible habits visible.','Tiny fact: a budget is a plan, not a punishment.','Tiny fact: liquidity matters even when returns look pretty.','Tiny fact: net worth is a snapshot, not a personality test.','Tiny fact: consistency usually beats heroic bursts of effort.','Tiny fact: diversification reduces dependence on one asset.','Tiny fact: knowing your cash flow is financial superpower territory.'
+ ],
+ morning:[
+  'Morning, Abhishek. Let’s keep the rupees behaved. ☀️','New day. Same wallet. Better decisions.','Good morning. Your money has survived the night.','Morning check: future-you approves of boring discipline.','Coffee first. Financial chaos second. ☕'
+ ],
+ evening:[
+  'Evening report: what happened to the money today? 🌙','Day nearly done. Time to inspect the financial evidence.','Good evening. The wallet has submitted its report.','Today is almost over. The numbers are not.','End-of-day audit, minus the courtroom drama.'
+ ],
+ event:[
+  'Milestone unlocked. Future-you just got a little happier. 🎉','That deserves a tiny victory lap.','Progress detected. Do not become unbearable about it. 😂','A financial win is still a win.','The graph has something nice to say for once.','That number moved in the right direction. Keep it boring.','Achievement logged. Carry on, responsible human.'
+ ]
+};
+function ensurePersonal(){state.personalization??={enabled:true,funny:true,facts:true,recent:[],lastMessage:'',lastAt:0};state.personalization.recent??=[];return state.personalization}
+function ctx(){const now=new Date(),h=now.getHours(),m=state.money?.tx||[],w=state.wealth||{},spent=m.filter(x=>x.type==='expense').reduce((a,x)=>a+Number(x.amount||0),0),inc=m.filter(x=>x.type==='income').reduce((a,x)=>a+Number(x.amount||0),0),wc=typeof wealthCalc==='function'?wealthCalc():{net:0};return {hour:h,mode:app.mode,screen:app.mode==='money'?app.moneyPage:app.wealthPage,spent,inc,net:Number(wc.net||0),tx:m.length,goals:w.milestones?.length||0};}
+function candidates(c){const p=ensurePersonal(),base=[];if(c.mode==='wealth')base.push(...lib.wealth);else base.push(...lib.money);if(c.hour<11)base.push(...lib.morning);if(c.hour>=18)base.push(...lib.evening);if(p.funny)base.push(...lib.funny);if(p.facts)base.push(...lib.facts);if(c.goals)base.push(...lib.event);return base;}
+function pick(){const p=ensurePersonal();if(!p.enabled)return '';const c=ctx(),arr=candidates(c),recent=new Set(p.recent||[]),fresh=arr.filter(x=>!recent.has(x));let pool=fresh.length?fresh:arr;let msg=pool[Math.floor(Math.random()*pool.length)]||'Your money. Your rules.';p.recent=[...(p.recent||[]).filter(x=>x!==msg),msg].slice(-18);p.lastMessage=msg;p.lastAt=Date.now();return msg;}
+function applyMessage(force=false){const p=ensurePersonal();if(!p.enabled){document.querySelectorAll('.global-message,.surprise-preview').forEach(e=>e.textContent='');return ''}if(!force&&p.lastMessage)return p.lastMessage;return pick();}
+let lastHeaderContext='',lastDataFingerprint='';function header(force=false){const c=ctx(),name=getProfileName()||'Abhishek',title=document.getElementById('appTitle'),sub=document.getElementById('appSubtitle');if(!title||!sub)return;const key=`${c.mode}:${c.screen}`,fp=`${key}|${c.spent}|${c.inc}|${c.net}|${c.tx}|${c.goals}`;if(force||key!==lastHeaderContext||fp!==lastDataFingerprint){lastHeaderContext=key;lastDataFingerprint=fp;pick()}const moneyTitles=[`${name}'s Money 💸`,`Money HQ 💰`,`${name}'s Wallet HQ 🧾`],wealthTitles=[`${name}'s Wealth 📈`,`Future-You Fund 📊`,`${name}'s Wealth Desk 🧠`],titles=c.mode==='wealth'?wealthTitles:moneyTitles;title.textContent=titles[Math.floor(Math.random()*titles.length)];sub.textContent=c.mode==='wealth'?(c.net>0?'Building the long game. Quietly.':'Let’s build the first brick. 🧱'):(c.spent>0?'Keeping the money mess measurable. 😌':'Ready when the first rupee moves. 👀');document.getElementById('globalMessage').textContent=ensurePersonal().enabled?ensurePersonal().lastMessage:'';const more=document.getElementById('moreMessage');if(more)more.textContent=c.mode==='wealth'?'Your wealth corner. 📈':'Your financial command center. 🎛️';const wp=document.getElementById('wealthMoreMessage');if(wp)wp.textContent=c.mode==='wealth'?'Your wealth corner. 📈':'Your financial command center. 🎛️';const id=document.getElementById('identitySub');if(id)id.textContent=c.mode==='wealth'?'Building future-you money. 🧠':'Your tracker. Your rules. ✨';const sp=document.getElementById('surprisePreview');if(sp&&!sp.textContent.trim())sp.textContent='🎲 Tap for something unexpected.';const wsp=document.getElementById('wealthSurprisePreview');if(wsp&&!wsp.textContent.trim())wsp.textContent='🎲 Tap for something unexpected.';}
+window.showSurpriseMessage=function(){const msg=pick();['globalMessage','surprisePreview','wealthSurprisePreview'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=msg});};
+window.setPersonalization=function(k,v){const p=ensurePersonal();p[k]=!!v;save();renderMore();header();};
+window.openSettingsPanel=function(){const details=document.querySelector('#mmore details')||document.querySelector('#wmore details');if(details){details.open=true;details.scrollIntoView({behavior:'smooth',block:'center'})}};
+window.triggerProfilePhoto=function(){const i=document.getElementById('profilePhotoInput')||document.getElementById('wealthProfilePhotoInput');i?.click()};
+window.setProfilePhoto=function(input){const f=input?.files?.[0];if(!f)return;if(!f.type.startsWith('image/'))return alert('Choose an image.');const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=512,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);localStorage.setItem(PHOTO_KEY,c.toDataURL('image/jpeg',.86));renderProfile();renderMore()};img.src=r.result};r.readAsDataURL(f)};
+window.removeProfilePhoto=function(){localStorage.removeItem(PHOTO_KEY);renderProfile();renderMore()};
+window.renderProfile=function(){const name=getProfileName(),email=getProfileEmail(),photo=localStorage.getItem(PHOTO_KEY);['profileNameInput','wealthProfileNameInput'].forEach(id=>{const e=$(id);if(e)e.value=name==='Default'?'':name});['profileEmailInput','wealthProfileEmailInput'].forEach(id=>{const e=$(id);if(e)e.value=email});['profileNameLabel','wealthProfileNameLabel'].forEach(id=>{const e=$(id);if(e)e.textContent=name});['profileAvatar','wealthProfileAvatar'].forEach(id=>{const e=$(id);if(e){e.innerHTML='';if(photo){e.style.backgroundImage=`url(${photo})`;e.style.backgroundSize='cover';e.style.backgroundPosition='center'}else{e.style.backgroundImage='';e.textContent=profileInitials(name)}}})};
+window.saveProfile=function(){const n=(document.getElementById('profileNameInput')?.value||document.getElementById('wealthProfileNameInput')?.value||'').trim(),e=(document.getElementById('profileEmailInput')?.value||document.getElementById('wealthProfileEmailInput')?.value||'').trim();if(!n)return alert('Enter your name.');if(e&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(e))return alert('Enter a valid email address.');localStorage.setItem(PROFILE_KEY+'_name',n);localStorage.setItem(PROFILE_KEY+'_email',e);renderProfile();renderMore();header()};
+window.renderMore=function(){renderProfile();const p=ensurePersonal();['personalEnabled','wealthPersonalEnabled'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=p.enabled!==false});['personalFunny','wealthPersonalFunny'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=p.funny!==false});['personalFacts','wealthPersonalFacts'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=p.facts!==false});const cm=document.getElementById('mCatsManage');if(cm)cm.innerHTML=state.money.cats.map(c=>`<div class="manage-row"><b>${esc(c.icon+' '+c.name)}</b><span></span><button class="mini" onclick="openCategory('${c.id}')">Edit</button><button class="mini danger" onclick="deleteCategory('${c.id}')">Delete</button></div>`).join('')||'<div class="empty">No categories.</div>';const mm=document.getElementById('mMethodsManage');if(mm)mm.innerHTML=state.money.methods.map(m=>`<div class="manage-row"><b>💳 ${esc(m.name)}</b><span>${esc(m.type)}</span><button class="mini" onclick="openMethod('${m.id}')">Edit</button><button class="mini danger" onclick="deleteMethod('${m.id}')">Delete</button></div>`).join('')||'<div class="empty">No payment methods.</div>';const im=document.getElementById('mIncomeManage');if(im)im.innerHTML=state.money.incomeAccounts.map(a=>`<div class="manage-row"><b>🏦 ${esc(a.name)}</b><span></span><button class="mini" onclick="openIncomeAccount('${a.id}')">Edit</button><button class="mini danger" onclick="deleteIncomeAccount('${a.id}')">Delete</button></div>`).join('')||'<div class="empty">No income accounts.</div>';};
+window.backupPayload=function(){return {format:'Spend Tracker Backup',version:'19.02',schema:'spend-tracker-v20',exportedAt:new Date().toISOString(),profile:{name:getProfileName(),email:getProfileEmail(),photo:(getProfile().photo||localStorage.getItem(PHOTO_KEY)||'')},personalization:ensurePersonal(),data:state}};
+const oldRefresh=window.refresh;window.refresh=function(){oldRefresh();header()};
+const oldSwitch=window.switchApp;window.switchApp=function(mode){oldSwitch(mode);header()};
+const oldNavigate=window.navigate;window.navigate=function(section){oldNavigate(section);header()};
+const oldOpenMore=window.openMore;window.openMore=function(){oldOpenMore();header()};
+window.importData=function(){readBackup((x,raw)=>{if(!confirm('Restore this backup and replace the current Money + Wealth data?'))return;state=x;state.money??={tx:[],cats:[],incomeCats:[],methods:[],incomeAccounts:[],budgets:{overall:0,categories:{}}};state.money.budgets??={overall:0,categories:{}};state.wealth??={debts:[],assets:[],mfs:[],fds:[],stocks:[],loans:[],epfo:{balance:0,contribution:0,date:today()},history:[],milestones:[]};state.wealth.epfo??={balance:0,contribution:0,date:today()};state.wealth.history??=[];state.wealth.milestones??=[];state.themeMode??='manual';state.textScale??='normal';if(raw?.profile){const pn=typeof raw.profile==='object'?raw.profile.name:raw.profile;const pe=typeof raw.profile==='object'?(raw.profile.email||''):'';if(pn)localStorage.setItem(PROFILE_KEY+'_name',String(pn));if(pe)localStorage.setItem(PROFILE_KEY+'_email',String(pe));if(typeof raw.profile==='object'&&raw.profile.photo)localStorage.setItem(PHOTO_KEY,raw.profile.photo)}if(raw?.personalization)state.personalization=raw.personalization;save();refresh();alert('Backup restored successfully.')})};
+window.resetProfile=function(){if(!confirm('Delete all current Money and Wealth data? This cannot be undone from the app.'))return;localStorage.removeItem(KEY);localStorage.removeItem(PROFILE_KEY+'_name');localStorage.removeItem(PROFILE_KEY+'_email');localStorage.removeItem(PHOTO_KEY);location.reload()};
+function init(){ensurePersonal();renderProfile();renderMore();header(true);setInterval(()=>{if(document.visibilityState==='visible')showSurpriseMessage()},45000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')header(true)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>\n
+<style id="v1903-overhaul">
+:root{
+ --money:#14b8a6;--money2:#22d3ee;--money-bg:#ecfdfb;
+ --wealth:#7c3aed;--wealth2:#06b6d4;--wealth-bg:#f5f3ff;
+ --accent:#14b8a6;
+}
+.money-page{--page-accent:#14b8a6}.wealth-page{--page-accent:#7c3aed}
+.mode button.money-active{background:linear-gradient(135deg,#14b8a6,#0ea5e9);box-shadow:0 4px 14px #14b8a644}
+.mode button.wealth-active{background:linear-gradient(135deg,#7c3aed,#06b6d4);box-shadow:0 4px 14px #7c3aed44}
+.money-page .primary,.money-page .full.primary{background:linear-gradient(135deg,#14b8a6,#0ea5e9)!important}
+.wealth-page .primary,.wealth-page .full.primary{background:linear-gradient(135deg,#7c3aed,#06b6d4)!important}
+.money-page .section h2,.money-page .global-message{color:#0f9f91}.wealth-page .section h2,.wealth-page .global-message{color:#6d36d9}
+.settings-panel{position:fixed;inset:0;background:#0b1220b8;display:none;align-items:flex-end;z-index:5000;backdrop-filter:blur(4px)}
+.settings-panel.show{display:flex}.settings-panel .sheet{width:min(800px,100%);max-height:94dvh;overflow:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:14px 18px calc(92px + env(safe-area-inset-bottom));box-shadow:0 -16px 50px #0004}
+.settings-panel .settings-list-card{margin-top:14px}.settings-panel .settings-list-card details:first-child{border-top:0}
+.settings-panel .settings-list-card{display:block!important}
+.settings-panel .wealth-setup{margin:12px 0 0}.settings-panel .wealth-setup .quick-setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.settings-panel .wealth-setup .quick-setting:last-child{border-bottom:0}.settings-panel .quick-setting b{font-size:15px}.settings-panel .quick-setting span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.surprise-card{position:relative;overflow:hidden}.surprise-card .surprise-preview{font-size:15px;line-height:1.35;font-weight:760;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:82%}.surprise-card{cursor:pointer}.surprise-card .secondary{position:absolute;right:12px;top:50%;transform:translateY(-50%);min-width:72px}
+.brain-food-panel .sheet{padding-bottom:calc(70px + env(safe-area-inset-bottom))}.brain-card{padding:26px 20px;text-align:center;background:var(--surface2);border:1px solid var(--line);border-radius:22px;margin-top:14px}.brain-card .brain-icon{font-size:52px}.brain-card .brain-text{font-size:25px;line-height:1.2;font-weight:900;margin:20px 4px}.brain-card .brain-tag{font-size:11px;font-weight:850;color:var(--page-accent,var(--accent));letter-spacing:.5px;text-transform:uppercase}
+@media(max-width:560px){.settings-panel .sheet{padding-left:16px;padding-right:16px}.brain-card .brain-text{font-size:23px}}
+</style>
+<script>
+(function(){
+  const $v=id=>document.getElementById(id);
+  function setupOverhaul(){
+    // Move all configuration controls behind the single Settings button.
+    const source=document.querySelector('#mmore > .settings-list-card');
+    const oldWealth=document.querySelector('#wmore > .settings-list-card');
+    if(oldWealth) oldWealth.remove();
+    if(source && !$v('settingsPanel')){
+      const panel=document.createElement('div');
+      panel.id='settingsPanel'; panel.className='settings-panel';
+      panel.innerHTML=`<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><h2>Settings</h2><div class="small">Set it once. Get back to tracking.</div></div><button class="close" onclick="closeSettingsPanel()">✕</button></div></div>`;
+      document.body.appendChild(panel);
+      panel.querySelector('.sheet').appendChild(source);
+      const card=panel.querySelector('.settings-list-card');
+      const personal=card?.querySelector('details:has(#personalEnabled)');
+      const wealth=document.createElement('details');
+      wealth.className='wealth-setup';
+      wealth.innerHTML=`<summary>📈 Wealth setup</summary><div class="settings-body"><div class="quick-setting"><div><b>Net worth</b><span>Assets, liabilities and allocation</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('networth')">Open</button></div><div class="quick-setting"><div><b>Investments</b><span>MFs, FDs and Stocks / ETFs</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('investments')">Open</button></div><div class="quick-setting"><div><b>Money owed</b><span>Lent and borrowed money</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('debts')">Open</button></div><div class="quick-setting"><div><b>Milestones</b><span>Track future goals</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('more')">Open</button></div></div>`;
+      if(card){
+        const first=card.querySelector('details');
+        first?.before(wealth);
+      }
+    }
+    // More stays clean: identity + Brain Food only. Settings controls are now in the panel.
+    document.querySelectorAll('#mmore > .settings-list-card,#wmore > .settings-list-card').forEach(e=>e.remove());
+    // Add a real Brain Food panel once.
+    if(!$v('brainFoodPanel')){
+      const p=document.createElement('div'); p.id='brainFoodPanel'; p.className='modal brain-food-panel';
+      p.innerHTML=`<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><h2>🎲 Brain Food</h2><div class="small">Random wisdom, finance facts and nonsense.</div></div><button class="close" onclick="closeBrainFood()">✕</button></div><div class="brain-card"><div id="brainFoodIcon" class="brain-icon">🧠</div><div id="brainFoodText" class="brain-text">Something worth reading</div><div id="brainFoodTag" class="brain-tag">BRAIN FOOD</div></div><button class="primary full" style="margin-top:14px" onclick="showSurpriseMessage()">🎲 Give me another</button></div>`;
+      document.body.appendChild(p);
+    }
+  }
+  window.openSettingsPanel=function(){setupOverhaul();$v('settingsPanel')?.classList.add('show')};
+  window.closeSettingsPanel=function(){$v('settingsPanel')?.classList.remove('show')};
+  window.closeBrainFood=function(){$v('brainFoodPanel')?.classList.remove('show')};
+  const oldShow=window.showSurpriseMessage;
+  window.showSurpriseMessage=function(){
+    const msg=typeof pick==='function'?pick():'';
+    const text=msg||'Your money deserves a little attention today.';
+    ['globalMessage','surprisePreview','wealthSurprisePreview'].forEach(id=>{const e=$v(id);if(e)e.textContent=text});
+    const bf=$v('brainFoodText'); if(bf)bf.textContent=text;
+    const tag=$v('brainFoodTag'); if(tag)tag.textContent=(typeof ctx==='function'&&ctx().mode==='wealth')?'WEALTH BRAIN FOOD':'MONEY BRAIN FOOD';
+    $v('brainFoodPanel')?.classList.add('show');
+  };
+  // Keep the profile as one shared source, including photo restoration from backups.
+  const oldRenderProfile=window.renderProfile;
+  window.renderProfile=function(){if(oldRenderProfile)oldRenderProfile();const photo=localStorage.getItem(typeof PHOTO_KEY!=='undefined'?PHOTO_KEY:'spend_tracker_profile_photo');document.querySelectorAll('.profile-avatar').forEach(e=>{if(photo){e.style.backgroundImage=`url(${photo})`;e.style.backgroundSize='cover';e.style.backgroundPosition='center';e.textContent=''} });};
+  // Upgrade the More teaser whenever the app refreshes, without making it noisy.
+  const oldHeader=window.header;
+  window.header=function(force){if(oldHeader)oldHeader(force);const p=typeof ensurePersonal==='function'?ensurePersonal():null;const msg=p?.lastMessage;if(msg){['surprisePreview','wealthSurprisePreview'].forEach(id=>{const e=$v(id);if(e)e.textContent=msg})} };
+  // Fix backup restore so profile photo is truly part of the shared profile.
+  const oldImport=window.importData;
+  window.importData=function(){
+    const input=document.createElement('input'); input.type='file'; input.accept='.json,application/json';
+    input.onchange=()=>{const f=input.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const raw=JSON.parse(r.result),x=raw?.data||raw;if(!x?.money||!x?.wealth)throw new Error('shape');if(!confirm('Restore this backup and replace the current Money + Wealth data?'))return;state=x;if(raw?.profile){const pn=typeof raw.profile==='object'?raw.profile.name:raw.profile;const pe=typeof raw.profile==='object'?(raw.profile.email||''):'';const ph=typeof raw.profile==='object'?(raw.profile.photo||''):'';if(pn)localStorage.setItem(PROFILE_KEY+'_name',String(pn));if(pe)localStorage.setItem(PROFILE_KEY+'_email',String(pe));if(ph)localStorage.setItem(PHOTO_KEY,String(ph));}save();refresh();renderProfile();header(true);alert('Backup restored successfully.')}catch(e){alert('Invalid Spend Tracker backup file.')}};r.readAsText(f)}; input.click();
+  };
+  // Re-run setup after the initial app render.
+  setupOverhaul();
+})();
+</script>
+
+<style id="v20-root-theme">
+/* V20 ROOT THEME: semantic variables only */
+:root{
+  --bg:#eef3f6;
+  --surface:#ffffff;
+  --surface2:#f6f8fa;
+  --surface3:#edf2f5;
+  --text:#172230;
+  --muted:#667586;
+  --line:#d9e1e8;
+  --money-accent:#0ea5a0;
+  --money-accent-2:#14b8a6;
+  --money-soft:#e7fbf8;
+  --money-strong:#078b84;
+  --wealth-accent:#6d5ce7;
+  --wealth-accent-2:#8b5cf6;
+  --wealth-soft:#f1edff;
+  --success:#0a9f63;
+  --danger:#d64545;
+  --warning:#d28a1c;
+  --nav-bg:rgba(255,255,255,.92);
+  --nav-border:#dbe3ea;
+  --overlay:rgba(11,18,28,.56);
+  --shadow:0 12px 34px rgba(23,34,48,.08);
+}
+body.dark{
+  --bg:#0b1018;
+  --surface:#131a25;
+  --surface2:#1a2431;
+  --surface3:#202c3a;
+  --text:#f4f7fb;
+  --muted:#9aa8b8;
+  --line:#2b394a;
+  --money-accent:#22c7bc;
+  --money-accent-2:#14b8a6;
+  --money-soft:#14312f;
+  --money-strong:#34d9cd;
+  --wealth-accent:#8c7cff;
+  --wealth-accent-2:#a78bfa;
+  --wealth-soft:#261f43;
+  --success:#33c78b;
+  --danger:#ff7b7b;
+  --warning:#f0b34f;
+  --nav-bg:rgba(15,22,32,.94);
+  --nav-border:#253244;
+  --overlay:rgba(2,6,12,.74);
+  --shadow:0 16px 42px rgba(0,0,0,.28);
+}
+body,button,input,select,textarea{color:var(--text)}
+body{background:var(--bg)!important}
+body:before{opacity:.10!important}
+.card,.quick-card,.metric,.hero-stat,.trend-card,.modal .sheet,.settings-panel .sheet,.settings-list-card,
+.action-card,.more-action,.identity-card,.surprise-card,.manage-row,.search,.filters button,.secondary,.theme,
+.mode,.mode button,.fab,nav,.sheet-head,.text-scale-row button,.navitem,.savebar button,
+select,input,textarea{border-color:var(--line)!important}
+.card,.quick-card,.metric,.trend-card,.identity-card,.surprise-card,.settings-list-card,.action-card,.more-action,
+.settings-panel .sheet,.modal .sheet{background:var(--surface)!important;box-shadow:var(--shadow)}
+input,select,textarea,.search,.filters button,.secondary,.text-scale-row button,.savebar button{background:var(--surface2)!important;color:var(--text)!important}
+button{color:var(--text)}
+.small,.brand p,.section .small,.profile-sub,.identity-sub,.more-card-head span,.surprise-preview{color:var(--muted)!important}
+body.dark .primary{color:#071319!important}
+body.dark .secondary,body.dark .theme{color:var(--text)!important;background:var(--surface2)!important}
+body.dark .close{background:var(--surface2)!important;color:var(--text)!important}
+body.dark .navitem{color:var(--muted)!important;background:transparent!important}
+body.dark .navitem.selected,body.dark .navitem.money-selected,body.dark .navitem.wealth-selected{color:#fff!important}
+body.dark .manage-row{background:transparent!important}
+body.dark .action-card,body.dark .more-action{background:var(--surface2)!important}
+.mode{background:var(--surface)!important}
+.mode button{background:transparent!important;color:var(--muted)!important}
+.mode button.money-active{background:linear-gradient(135deg,var(--money-accent),#0e8ec7)!important;color:#fff!important;box-shadow:0 8px 22px rgba(14,165,160,.28)!important}
+.mode button.wealth-active{background:linear-gradient(135deg,var(--wealth-accent),var(--wealth-accent-2))!important;color:#fff!important;box-shadow:0 8px 22px rgba(109,92,231,.28)!important}
+.money-page{--page-accent:var(--money-accent)}
+.wealth-page{--page-accent:var(--wealth-accent)}
+.money-page .primary,.money-page .fab{background:linear-gradient(135deg,var(--money-accent),#0e8ec7)!important;color:#fff!important}
+.wealth-page .primary,.wealth-page .fab{background:linear-gradient(135deg,var(--wealth-accent),var(--wealth-accent-2))!important;color:#fff!important}
+.money-page .section h2,.money-page .global-message{color:var(--money-strong)!important}
+.wealth-page .section h2,.wealth-page .global-message{color:var(--wealth-accent)!important}
+
+/* V20 Settings + More */
+.v20-more-wrap{display:grid;gap:14px}
+.v20-more-intro{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.v20-settings-btn{width:100%;min-height:54px;border:1px solid var(--line);border-radius:18px;background:var(--surface2)!important;font-weight:900;font-size:17px}
+.v20-brain-teaser{position:relative;min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(135deg,var(--surface),var(--surface2));cursor:pointer}
+.v20-brain-teaser .teaser-copy{min-width:0}.v20-brain-teaser b{font-size:17px}.v20-brain-teaser p{margin:5px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:13px;line-height:1.35}.v20-brain-dice{flex:0 0 50px;height:50px;border:1px solid var(--line);border-radius:16px;background:var(--surface2);display:grid;place-items:center;font-size:25px}
+.v20-profile-row{display:flex;align-items:center;gap:14px}.v20-profile-row .profile-avatar{width:62px;height:62px;border-radius:20px;font-size:22px}
+.v20-profile-row .profile-avatar.large{width:62px;height:62px;border-radius:20px;background-size:cover;background-position:center;flex:0 0 62px}
+.settings-panel.v20-settings-root{background:var(--overlay);backdrop-filter:blur(8px)}
+.settings-panel.v20-settings-root .sheet{background:var(--surface)!important;color:var(--text)!important}
+.v20-setting-note{color:var(--muted);font-size:12px;line-height:1.35;margin:4px 0 0}
+.v20-settings-root details{border:1px solid var(--line)!important;border-radius:18px!important;margin:10px 0!important;background:var(--surface2)!important;overflow:hidden}
+.v20-settings-root details summary{padding:16px 17px!important;font-size:16px!important;background:transparent!important}
+.v20-settings-root details[open] summary{background:var(--surface3)!important}
+.v20-settings-root .settings-body{padding:2px 16px 16px!important}
+.v20-settings-root .more-grid{gap:10px}
+.v20-settings-root .more-action{background:var(--surface)!important}
+.v20-settings-root .wealth-setup{border:1px solid var(--line)!important;border-radius:18px!important;background:var(--surface2)!important}
+
+/* V20 Brain Food global overlay */
+#brainFoodPanel.v20-brain-root{position:fixed!important;inset:0!important;background:var(--overlay)!important;z-index:7000!important;display:none!important;align-items:flex-end!important;backdrop-filter:blur(8px)}
+#brainFoodPanel.v20-brain-root.show{display:flex!important}
+#brainFoodPanel.v20-brain-root .sheet{background:var(--surface)!important;color:var(--text)!important;border-radius:28px 28px 0 0!important;max-height:92dvh;overflow:auto}
+#brainFoodPanel.v20-brain-root .brain-card{background:var(--surface2)!important;border-color:var(--line)!important}
+#brainFoodPanel.v20-brain-root .brain-tag{color:var(--page-accent,var(--money-accent))!important}
+.v20-brain-close-hint{color:var(--muted);font-size:11px;text-align:center;margin-top:9px}
+
+/* V20 bottom navigation */
+nav{background:var(--nav-bg)!important;border-top:1px solid var(--nav-border)!important;backdrop-filter:blur(16px)}
+.navinner{gap:6px!important}
+.navitem{position:relative;border:1px solid transparent!important;border-radius:16px!important;transition:transform .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease!important}
+.navitem span{font-size:21px!important;line-height:1}
+.navitem.selected,.navitem.money-selected,.navitem.wealth-selected{background:var(--surface2)!important;box-shadow:inset 0 0 0 1px var(--line),0 5px 16px rgba(23,34,48,.08)!important;font-weight:900!important;transform:translateY(-2px)}
+.navitem.money-selected{color:var(--money-accent)!important}
+.navitem.wealth-selected{color:var(--wealth-accent)!important}
+
+/* V20 input and form consistency */
+input::placeholder,textarea::placeholder{color:var(--muted)!important;opacity:.9}
+select option{background:var(--surface)!important;color:var(--text)!important}
+.fab{box-shadow:0 10px 28px rgba(23,34,48,.22)!important}
+
+/* prevent stale white inline backgrounds from surviving dark theme */
+body.dark [style*="background:#fff"],body.dark [style*="background: white"],body.dark [style*="background: #fff"]{background:var(--surface)!important;color:var(--text)!important}
+body.dark [style*="color:#000"],body.dark [style*="color: #000"],body.dark [style*="color:black"]{color:var(--text)!important}
+@media(max-width:560px){.v20-brain-teaser{min-height:88px}.navitem{padding:9px 5px!important}.navitem span{font-size:20px!important}}
+</style>
+
+
+<script id="v20-architecture">
+(function(){
+  const V20_KEY='spend_tracker_v20_arch';
+  const $=id=>document.getElementById(id);
+  const safe=(fn, fallback)=>{try{return fn()}catch(e){return fallback}};
+
+  /* ---------- One source of truth for profile ---------- */
+  const profileKey={name:'spend_tracker_profile_name',email:'spend_tracker_profile_email',photo:'spend_tracker_profile_photo'};
+  function getProfile(){
+    return {name:localStorage.getItem(profileKey.name)||'Abhishek',email:localStorage.getItem(profileKey.email)||'',photo:localStorage.getItem(profileKey.photo)||localStorage.getItem(typeof PHOTO_KEY!=='undefined'?PHOTO_KEY:'spend_tracker_profile_photo_v1')||''};
+  }
+  window.V20Profile={
+    get:getProfile,
+    set(p){
+      p=p||{};
+      if(p.name!=null)localStorage.setItem(profileKey.name,String(p.name).trim()||'Abhishek');
+      if(p.email!=null)localStorage.setItem(profileKey.email,String(p.email).trim());
+      if(p.photo!=null){const v=String(p.photo||'');if(v){localStorage.setItem(profileKey.photo,v);try{localStorage.setItem(PHOTO_KEY,v)}catch(e){}}else{localStorage.removeItem(profileKey.photo);try{localStorage.removeItem(PHOTO_KEY)}catch(e){}}}
+      syncProfileUI();
+      safe(()=>header(true));
+    }
+  };
+  function applyAvatar(el,p){
+    if(!el)return;
+    if(p.photo){el.style.backgroundImage=`url(${p.photo})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.textContent='';}
+    else{el.style.backgroundImage='';el.textContent=(p.name||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'A';}
+  }
+  function syncProfileUI(){
+    const p=getProfile();
+    document.querySelectorAll('.profile-avatar').forEach(e=>applyAvatar(e,p)); document.querySelectorAll('[data-v20-shared-avatar]').forEach(e=>applyAvatar(e,p));
+    ['profileNameLabel','wealthProfileNameLabel'].forEach(id=>{const e=$(id);if(e)e.textContent=p.name});
+    ['profileNameInput','wealthProfileNameInput'].forEach(id=>{const e=$(id);if(e&&document.activeElement!==e)e.value=p.name});
+    ['profileEmailInput','wealthProfileEmailInput'].forEach(id=>{const e=$(id);if(e&&document.activeElement!==e)e.value=p.email});
+    document.querySelectorAll('[data-v20-profile-name]').forEach(e=>e.textContent=p.name);
+  }
+  window.syncProfileUI=syncProfileUI;
+
+  /* ---------- Root theme ---------- */
+  function syncTheme(){
+    const dark=!!state?.dark;
+    document.documentElement.style.setProperty('color-scheme',dark?'dark':'light');
+    document.body.classList.toggle('dark',dark);
+    const themeBtn=$('themeBtn');
+    if(themeBtn)themeBtn.textContent=dark?'☀':'☾';
+  }
+  window.V20Theme={sync:syncTheme};
+
+  /* ---------- Global personalization engine ---------- */
+  const library={
+    money:[
+      'Money is behaving today. Suspicious. 👀','Your wallet has entered the chat. 💸','Numbers first. Excuses later. 😌','Tracking money: cheaper than therapy. 😂','Every rupee now has a witness.','Small spends add up. Annoying, but true.','Your future self is keeping receipts. 🧾','Money moved. At least we know where.','Financial chaos, but organised. ✨','The wallet report has arrived.','Your bank balance requested adult supervision. 😭','One tap closer to knowing where it all went.','Spending visible. Panic optional.','Today’s numbers look less mysterious already.','Your money deserves better records.','A rupee tracked is a rupee understood.','Budgeting: telling money where to go before it runs away.','Good records beat good guesses.','Your wallet would like some boundaries. 😂','No judgement. Just numbers. Mostly.','Money in, money out, story documented.','The spreadsheet spirit approves. 🧠','Your spending has receipts now.','Tiny expenses are tiny until they form a committee.','Less guessing. More knowing.','Your money mess is measurable.','The numbers are innocent. Probably.','Keep tracking. Future Abhishek is watching. 👀','Another day, another financial plot twist.','At least the chaos has timestamps. 😂'
+    ],
+    wealth:[
+      'Slowly building the boring kind of rich. 📈','Future-you appreciates this screen.','Assets are doing some of the talking now.','Net worth grows one record at a time.','Quiet progress still counts.','Your money is finally wearing a long-term hat. 🎩','FDs, funds, stocks. A small financial squad.','Wealth is patience with better spreadsheets.','Compounding likes consistency.','Future Abhishek is taking notes. 👀','The portfolio report has entered the room.','Build first. Flex later. 😌','A little allocation beats a lot of confusion.','Long-term thinking looks good here.','Your assets have responsibilities now. 😂','Net worth: the scoreboard nobody sees until they do.','Diversification: because one idea should not run the whole show.','Good wealth tracking is gloriously boring.','Investing is patience with paperwork.','Your future balance sheet says thanks.','Money sleeping? Not all of it. 📊','Build quietly. Let the numbers make noise.','The empire is small. The spreadsheet is ambitious. 😂','One more record for future-you.','A clean wealth ledger beats a heroic memory.'
+    ],
+    action:[
+      'Saved. Future-you has the receipt. ✅','Locked in. The numbers now have paperwork.','Done. Tiny admin victory. 🏆','Recorded. No archaeology required later.','Saved successfully. Your wallet may relax now.','Noted. The chaos is officially documented.','Added. Another financial breadcrumb.','Updated. The numbers got the memo.','Done. Very responsible of you. 😌','Saved. This is what organised chaos looks like.'
+    ],
+    backup:[
+      'Backup done. Future-you says thanks. ☁️','Your data now has an escape plan.','Backup saved. Disaster has been mildly inconvenienced. 😂','One backup closer to sleeping peacefully.','Future Abhishek just got a favour.','Data packed. Ready for the next phone.'
+    ],
+    empty:[
+      'Nothing here yet. Peaceful. Suspicious. 🫠','A rare moment when your wallet is quiet.','No records yet. The spreadsheet is judging nobody.','Blank slate. Dangerous amount of optimism. 😂'
+    ],
+    budget:[
+      'Budget mode: give every rupee a job.','Numbers do not negotiate. Budgets try. 😂','A limit is just a plan wearing a seatbelt.','Your budget has entered the building.','Spend smart. The app is keeping receipts. 👀'
+    ],
+    analytics:[
+      'Numbers do not lie. They merely expose our decisions.','Here lies the evidence. 🧾','Charts: because tables needed better lighting.','Your spending has a storyline. We are reading it.'
+    ],
+    transactions:[
+      'Recent financial events, neatly documented.','The receipt museum is open. 🧾','Every transaction tells a tiny story.','Money moved. Here is the paper trail.'
+    ],
+    more:[
+      'Your money deserves a little attention today.','Welcome to the control room. 🚀','Settings are hiding because you only need them sometimes.','A clean tracker for a messy world.','One place for the money mess. 😅','Numbers behaving themselves for once. 🎲'
+    ]
+  };
+  const recently=[];
+  function choose(arr){
+    if(!arr?.length)return '';
+    const options=arr.filter(x=>!recently.slice(-5).includes(x));
+    const pick=(options.length?options:arr)[Math.floor(Math.random()*(options.length?options.length:arr.length))];
+    recently.push(pick);if(recently.length>12)recently.shift();
+    return pick;
+  }
+  function currentContext(){
+    const mode=app?.mode||'money';
+    const page=mode==='wealth'?(app?.wealthPage||'home'):(app?.moneyPage||'home');
+    let bucket=mode==='wealth'?'wealth':page;
+    if(page==='more')bucket='more';
+    if(['transactions','analytics','budgets'].includes(page))bucket=page;
+    const tx=state?.money?.tx||[];
+    const today=(typeof window.today==='function'?today():new Date().toISOString().slice(0,10));
+    const todays=tx.filter(t=>t.date===today);
+    const spend=todays.filter(t=>t.type==='expense').reduce((a,t)=>a+Number(t.amount||0),0);
+    return {mode,page,bucket,spendToday:spend,txCount:tx.length,name:getProfile().name};
+  }
+  function contextMessage(kind){
+    if(kind==='action')return choose(library.action);
+    if(kind==='backup')return choose(library.backup);
+    const c=currentContext();
+    if(kind==='empty')return choose(library.empty);
+    if(c.bucket==='more')return choose(library.more);
+    if(c.bucket==='transactions')return choose(library.transactions);
+    if(c.bucket==='analytics')return choose(library.analytics);
+    if(c.bucket==='budgets')return choose(library.budget);
+    return choose(library[c.mode]||library.money);
+  }
+  window.PersonalizationEngine={message:contextMessage,context:currentContext,library};
+
+  function refreshHeaderText(){
+    const p=getProfile(), c=currentContext();
+    const brandH=document.querySelector('.brand h1'), brandP=document.querySelector('.brand p');
+    if(brandH){brandH.textContent=c.mode==='wealth' ? `${p.name}'s Wealth 📈` : `${p.name}'s Money 💸`;}
+    if(brandP){brandP.textContent=c.mode==='wealth' ? 'Building future-you money, one record at a time.' : 'Keeping the money mess measurable. 😌';}
+    document.querySelectorAll('[data-v20-global-message]').forEach(e=>e.textContent=contextMessage());
+  }
+  window.refreshHeaderText=refreshHeaderText;
+
+  /* ---------- Clean More page ---------- */
+  function rewriteMore(sectionId,wealth=false){
+    const root=$(sectionId); if(!root)return;
+    // Keep More intentionally small. Remove all legacy/previously generated children.
+    root.innerHTML='';
+    const p=getProfile(), name=esc(p.name||'Abhishek');
+    const msg=esc(contextMessage());
+    root.insertAdjacentHTML('beforeend',`<div class="v20-more-wrap" id="v20MoreWrap-${wealth?'w':'m'}">
+      <div class="v20-more-intro"><div><h2 style="margin:0">More</h2><div class="small">${wealth?'The wealth control room. 📈':'The money control room. 💸'}</div></div><div style="font-size:18px;font-weight:900">${wealth?'📊':'🧩'}</div></div>
+      <div class="card"><div class="v20-profile-row"><div class="profile-avatar large" data-v20-shared-avatar="true"></div><div><div style="font-size:20px;font-weight:900" data-v20-profile-name>${name}</div><div class="small">${wealth?'Building future-you money.':'Your tracker. Your rules. ✨'}</div></div></div><button class="v20-settings-btn" style="margin-top:15px" onclick="openSettingsPanel()">⚙️ Settings</button></div>
+      <div class="v20-brain-teaser" onclick="openBrainFood()"><div class="teaser-copy"><b>🧠 Today’s thought</b><p id="v20BrainTeaser-${wealth?'w':'m'}">${msg}</p></div><button type="button" class="v20-brain-dice" onclick="event.stopPropagation();openBrainFood();" aria-label="Open Brain Food">🎲</button></div>
+      <div class="card"><div class="more-card-head"><b>Quick links</b><span>${wealth?'Wealth':'Daily use'}</span></div><div class="more-grid" style="margin-top:10px">${wealth?`<button class="more-action" onclick="openWealthPage('networth')">📈 Net worth<span>See the big picture</span></button><button class="more-action" onclick="openWealthPage('investments')">💼 Investments<span>FDs, funds, stocks</span></button>`:`<button class="more-action" onclick="openMoneyPage('transactions')">🧾 Transactions<span>See recent money</span></button><button class="more-action" onclick="openMoneyPage('budgets')">🎯 Budgets<span>Check your limits</span></button>`}</div></div>
+    </div>`);
+    syncProfileUI();
+  }
+
+  /* ---------- Settings panel: single layer, exclusive accordions ---------- */
+  function buildSettings(){
+    let panel=$('settingsPanel');
+    // Preserve the original settings content once, even though the More page itself stays clean.
+    if(!window.__v20SettingsTemplate){
+      const existing=document.querySelector('#settingsPanel .settings-list-card')||document.querySelector('#mmore > .settings-list-card')||document.querySelector('#wmore > .settings-list-card');
+      if(existing)window.__v20SettingsTemplate=existing.cloneNode(true);
+    }
+    if(!panel){
+      panel=document.createElement('div');panel.id='settingsPanel';document.body.appendChild(panel);
+    }
+    panel.className='settings-panel v20-settings-root';
+    panel.innerHTML=`<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><h2>Settings</h2><div class="small">Set it once. Get back to tracking.</div></div><button class="close" onclick="closeSettingsPanel()">✕</button></div><div id="v20SettingsBody"></div></div>`;
+    const body=$('v20SettingsBody');
+    const old=document.querySelector('#mmore > .settings-list-card')||document.querySelector('.settings-list-card');
+    const template=old||window.__v20SettingsTemplate;
+    if(template){
+      const node=(template===old?template:template.cloneNode(true));
+      body.appendChild(node);node.style.display='block';window.__v20SettingsTemplate=node.cloneNode(true);
+    }
+    // Insert wealth setup if not already represented.
+    if(!body.querySelector('.wealth-setup')){
+      const d=document.createElement('details');d.className='wealth-setup';d.innerHTML=`<summary>📈 Wealth setup</summary><div class="settings-body"><div class="quick-setting"><div><b>Wealth records</b><span>FD, mutual funds, money owed, EPFO, loans, stocks/ETFs and other assets.</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('more')">Open</button></div><div class="quick-setting"><div><b>Milestones</b><span>Track targets and progress.</span></div><button class="secondary" onclick="closeSettingsPanel();openWealthPage('more')">Open</button></div></div>`;
+      body.prepend(d);
+    }
+    // Clean copy of labels and turn old list into grouped settings.
+    body.querySelectorAll('details').forEach(d=>{
+      d.addEventListener('toggle',()=>{
+        if(!d.open)return;
+        body.querySelectorAll('details').forEach(o=>{if(o!==d)o.open=false;});
+      });
+    });
+    panel.addEventListener('click',e=>{if(e.target===panel)closeSettingsPanel();});
+  }
+  window.openSettingsPanel=function(){buildSettings();$('settingsPanel')?.classList.add('show');};
+  window.closeSettingsPanel=function(){$('settingsPanel')?.classList.remove('show');};
+
+  /* ---------- Brain Food: one overlay ---------- */
+  function buildBrain(){
+    let p=$('brainFoodPanel');
+    if(!p){
+      p=document.createElement('div');p.id='brainFoodPanel';document.body.appendChild(p);
+    }
+    p.className='modal brain-food-panel v20-brain-root';
+    p.innerHTML=`<div class="sheet"><div class="handle"></div><div class="sheet-head"><div><h2>🎲 Brain Food</h2><div class="small">A little wisdom. A little nonsense. No subscription.</div></div><button class="close" onclick="closeBrainFood()">✕</button></div><div class="brain-card"><div id="brainFoodIcon" class="brain-icon">🧠</div><div id="brainFoodText" class="brain-text">Something worth reading</div><div id="brainFoodTag" class="brain-tag">BRAIN FOOD</div></div><button class="primary full" style="margin-top:14px" onclick="showSurpriseMessage()">🎲 Give me another</button><div class="v20-brain-close-hint">Tap outside or scroll to close.</div></div>`;
+    p.addEventListener('click',e=>{if(e.target===p)closeBrainFood()});
+    p.querySelector('.sheet').addEventListener('click',e=>e.stopPropagation());
+    p.querySelector('.sheet').addEventListener('touchstart',()=>{}, {passive:true});
+  }
+  window.openBrainFood=function(){
+    buildBrain();
+    window.__v20PreviewOpen=true;
+    if($('settingsPanel')?.classList.contains('show'))closeSettingsPanel();
+    $('brainFoodPanel')?.classList.add('show');
+    showSurpriseMessage();
+  };
+  window.closeBrainFood=function(){window.__v20PreviewOpen=false;$('brainFoodPanel')?.classList.remove('show')};
+  window.showSurpriseMessage=function(){
+    const msg=contextMessage();
+    const icon=currentContext().mode==='wealth'?'📈':'🧠';
+    ['globalMessage','surprisePreview','wealthSurprisePreview','v20BrainTeaser-m','v20BrainTeaser-w'].forEach(id=>{const e=$(id);if(e)e.textContent=msg});
+    const bf=$('brainFoodText');if(bf)bf.textContent=msg;
+    const bi=$('brainFoodIcon');if(bi)bi.textContent=icon;
+    const bt=$('brainFoodTag');if(bt)bt.textContent=currentContext().mode==='wealth'?'WEALTH BRAIN FOOD':'MONEY BRAIN FOOD';
+    const active=currentContext().mode==='wealth'?'v20BrainTeaser-w':'v20BrainTeaser-m';if($(active))$(active).textContent=msg;
+  };
+  // close preview on scroll/back/outside
+  window.addEventListener('scroll',()=>{if(window.__v20PreviewOpen)closeBrainFood()},{passive:true});
+  window.addEventListener('popstate',()=>{closeBrainFood();closeSettingsPanel()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeBrainFood();closeSettingsPanel()}});
+
+  /* ---------- Navigation: Home belongs to current mode ---------- */
+  function patchNavigation(){
+    const home=$('navHome'); if(home){home.onclick=()=>{goHome();return false};}
+    const btns=[['navHome','home'],['navTx','transactions'],['navAnalytics','analytics'],['navBudget','budgets'],['navMore','more']];
+    btns.forEach(([id,p])=>{
+      const b=$(id);if(!b)return;
+      b.classList.remove('selected','money-selected','wealth-selected');
+      const active=app.mode==='wealth'?app.wealthPage===p:app.moneyPage===p;
+      if(active)b.classList.add(app.mode==='wealth'?'wealth-selected':'money-selected','selected');
+    });
+  }
+  window.V20Navigation={sync:patchNavigation};
+
+  /* ---------- Hook refresh without creating recursive refresh loops ---------- */
+  const originalRefresh=window.refresh;
+  window.refresh=function(){
+    originalRefresh();
+    safe(syncTheme);
+    safe(syncProfileUI);
+    safe(refreshHeaderText);
+    safe(patchNavigation);
+    safe(()=>rewriteMore('mmore',false));
+    safe(()=>rewriteMore('wmore',true));
+  };
+
+  // Patch profile save/restore to always sync globally.
+  const originalSaveProfile=window.saveProfile;
+  window.saveProfile=function(){
+    if(originalSaveProfile)originalSaveProfile();
+    const n=($('profileNameInput')?.value||$('wealthProfileNameInput')?.value||getProfile().name).trim();
+    const e=($('profileEmailInput')?.value||$('wealthProfileEmailInput')?.value||getProfile().email).trim();
+    V20Profile.set({name:n,email:e});
+    safe(()=>header(true));
+  };
+  const originalTriggerPhoto=window.triggerProfilePhoto;
+  window.triggerProfilePhoto=function(){
+    if(originalTriggerPhoto)originalTriggerPhoto();
+    setTimeout(syncProfileUI,120);
+  };
+
+  /* ---------- Global single-preview guard ---------- */
+  function closeRegularModals(exceptId){
+    document.querySelectorAll('.modal.show').forEach(m=>{if(m.id!==exceptId)m.classList.remove('show')});
+    if($('settingsPanel') && exceptId!=='settingsPanel')$('settingsPanel').classList.remove('show');
+  }
+  function guardModalOpen(name){
+    const original=window[name];
+    if(typeof original!=='function' || original.__v20guarded)return;
+    const wrapped=function(){
+      closeRegularModals();
+      return original.apply(this,arguments);
+    };
+    wrapped.__v20guarded=true;
+    window[name]=wrapped;
+  }
+  [
+    'openAction','openAsset','openBudget','openCategory','openDebt','openEpfo','openFd',
+    'openIncomeAccount','openLoan','openMethod','openMf','openMilestone','openRepay',
+    'openStock','openTrendDate','openTxMenu','openTransaction'
+  ].forEach(guardModalOpen);
+  const originalOpenSettingsPanel=window.openSettingsPanel;
+  if(typeof originalOpenSettingsPanel==='function'&&!originalOpenSettingsPanel.__v20guarded){
+    const guardedSettings=function(){closeRegularModals('settingsPanel');buildSettings();$('settingsPanel')?.classList.add('show')};
+    guardedSettings.__v20guarded=true;
+    window.openSettingsPanel=guardedSettings;
+  }
+  const originalOpenBrainFood=window.openBrainFood;
+  if(typeof originalOpenBrainFood==='function'&&!originalOpenBrainFood.__v20guarded){
+    const guardedBrain=function(){closeRegularModals('brainFoodPanel');return originalOpenBrainFood.apply(this,arguments)};
+    guardedBrain.__v20guarded=true;
+    window.openBrainFood=guardedBrain;
+  }
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[onclick]');
+    if(t){
+      const code=t.getAttribute('onclick')||'';
+      if(/open(Category|Method|IncomeAccount|Transaction|TxMenu|Action|Budget|Asset|Debt|Epfo|Fd|Loan|Mf|Milestone|Repay|Stock|TrendDate)\s*\(/.test(code)){
+        closeRegularModals();
+      }
+    }
+  },true);
+
+  // Profile photo: save the same value used by the legacy profile renderer and V20 shared profile.
+  window.setProfilePhoto=function(input){
+    const f=input?.files?.[0]; if(!f)return;
+    if(!f.type.startsWith('image/')){alert('Choose an image.');return}
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=512,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');
+        c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));
+        const ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);
+        const data=c.toDataURL('image/jpeg',.86);
+        V20Profile.set({photo:data});
+        if(typeof renderProfile==='function')renderProfile();
+        if(typeof renderMore==='function')renderMore();
+        if(typeof refresh==='function')refresh();
+        alert('Profile photo updated.');
+      };
+      img.onerror=()=>alert('Could not read that image.');
+      img.src=r.result;
+    };
+    r.onerror=()=>alert('Could not read that image.');
+    r.readAsDataURL(f);
+  };
+  window.removeProfilePhoto=function(){
+    V20Profile.set({photo:''});
+    if(typeof renderProfile==='function')renderProfile();
+    if(typeof renderMore==='function')renderMore();
+    if(typeof refresh==='function')refresh();
+    alert('Profile photo removed.');
+  };
+
+  function initV20(){
+    if(!window.__v20SettingsTemplate){const t=document.querySelector('#settingsPanel .settings-list-card')||document.querySelector('#mmore > .settings-list-card')||document.querySelector('#wmore > .settings-list-card');if(t)window.__v20SettingsTemplate=t.cloneNode(true);}
+    buildBrain();
+    syncTheme();syncProfileUI();
+    patchNavigation();
+    rewriteMore('mmore',false);rewriteMore('wmore',true);
+    refreshHeaderText();
+    // Remove any leftover inline settings cards from More after the app has rendered.
+    document.querySelectorAll('#mmore > .settings-list-card,#wmore > .settings-list-card').forEach(e=>e.remove());
+    // Keep settings available only through the button.
+    if($('settingsPanel'))$('settingsPanel').classList.remove('show');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(initV20,60));else setTimeout(initV20,60);
+})();
+</script>
+
+
+<style id="v20_2_personalization_css">
+/* V20.2 on-device Personalization Engine */
+.v202-context-note{margin-top:6px;font-size:13px;line-height:1.35;color:var(--page-accent,var(--accent));font-weight:800;min-height:18px}
+.v202-brain-card{position:relative;overflow:hidden}
+.v202-brain-visual{width:96px;height:96px;margin:4px auto 18px;border-radius:28px;display:grid;place-items:center;font-size:54px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),transparent 55%),linear-gradient(145deg,var(--surface2),var(--surface));border:1px solid var(--line);box-shadow:var(--shadow);animation:v202Float 3.8s ease-in-out infinite}
+.v202-brain-visual.small{width:58px;height:58px;border-radius:18px;font-size:30px;margin:0}
+@keyframes v202Float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}
+.v202-teaser-visual{display:flex;align-items:center;gap:10px;min-width:0}
+.v202-teaser-visual .teaser-copy{min-width:0}
+.v202-teaser-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v202-micro{font-size:11px;color:var(--muted);font-weight:700;margin-top:7px}
+body.dark .v202-brain-visual{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.10),transparent 55%),linear-gradient(145deg,var(--surface2),var(--surface))}
+</style>
+<script id="v20_2_personalization_engine">
+(function(){
+  'use strict';
+  const PKEY='spend_tracker_personalization_v202';
+  const VISUALS={
+    money:['💸','💰','🧾','👛','🪙','💳','😂','😅','🤨','🫠','🤦','👀','🤑','🧮','📊'],
+    wealth:['📈','📊','🧠','🏦','💎','🌱','🧱','🤑','🎯','🚀','🧭','💼','🔭','🪴','🪙'],
+    funny:['😂','😅','🤡','💀','🫠','🤦','👀','😎','🙃','🫡','😏','🧠'],
+    fact:['🧠','🔎','📚','💡','🧮','📐','📊','⏳'],
+    goal:['🎯','🏁','🚀','🏆','🧱','📈','✅'],
+    backup:['☁️','💾','🛟','🧳','🔐','✅'],
+    budget:['🎯','🧮','🚦','🧾','✂️','👀'],
+    transaction:['🧾','💳','💸','🧮','🔎','📌'],
+    default:['🧠','💡','👀','✨','🎲','📌']
+  };
+  const LIB={
+    money:[
+      ['Tracking money is cheaper than discovering where it vanished. 😂','funny'],['Your wallet has entered the meeting. Please be honest.','funny'],['Every rupee now has a paper trail. Tiny victory.','money'],['Money in, money out, story documented.','money'],['Small spends are only small when they happen alone.','fact'],['The numbers are innocent. The decisions are questionable. 😌','funny'],['A tracked rupee is a less mysterious rupee.','money'],['Your bank balance requested adult supervision. 👀','funny'],['Spending visible. Panic optional.','money'],['The wallet report has arrived.','transaction'],['Another financial plot twist, now with timestamps. 😂','funny'],['Good records beat good memory. Humans forget. Spreadsheets do not.','fact'],['Your money mess is officially measurable.','money'],['Tiny expenses are tiny until they form a committee.','funny'],['One tap closer to financial clarity.','money'],['A budget is just a plan with receipts.','budget'],['The wallet is speaking. We are taking minutes.','funny'],['Less guessing. More knowing.','money'],['Your future self is collecting receipts.','money'],['Money behaved today. Suspicious. 👀','funny'],['No judgement. Just numbers. Mostly.','funny'],['The spreadsheet spirit approves. 🧠','fact'],['The chaos has timestamps now. We are winning.','money'],['Your spending has witnesses.','transaction'],['One place for the money mess. 😅','funny'],['Financial housekeeping: glamorous in absolutely no universe.','funny'],['Every transaction is a tiny clue.','transaction'],['The numbers are telling on us again.','funny'],['Organised chaos is still chaos, just searchable.','funny'],['A clean ledger is a beautiful thing. Weird, but true.','money']
+    ],
+    wealth:[
+      ['Slowly building the boring kind of rich. 📈','wealth'],['Future-you appreciates this screen.','wealth'],['Wealth is patience with better records.','fact'],['Compounding likes consistency, not drama.','fact'],['Assets are now doing some of the talking.','wealth'],['Build quietly. Let the numbers make noise.','wealth'],['Your portfolio is basically a long game with paperwork.','funny'],['A little allocation beats a lot of confusion.','wealth'],['The empire is small. The spreadsheet is ambitious. 😂','funny'],['Future Abhishek is taking notes. 👀','wealth'],['One more record for the future balance sheet.','wealth'],['Diversification: because one idea should not run the whole show.','fact'],['Good wealth tracking is gloriously boring.','wealth'],['Your money is wearing a long-term hat. 🎩','funny'],['Net worth is just a scoreboard with receipts.','fact'],['Build first. Flex later. 😌','wealth'],['A clean wealth ledger beats heroic memory.','wealth'],['Patience looks good on a portfolio.','wealth'],['Quiet progress still counts.','wealth'],['The boring parts are often the useful parts.','fact'],['Your assets have responsibilities now. 😂','funny'],['Small records become useful history.','wealth'],['The long game starts with boring consistency.','wealth'],['Future-you likes organised numbers.','wealth'],['One more brick in the balance sheet. 🧱','wealth'],['Your wealth page is basically future-you paperwork.','funny'],['Long-term thinking: less exciting, more effective.','fact'],['Money sleeping? Not all of it. 📊','wealth'],['The portfolio report has entered the room.','wealth'],['Your future balance sheet says thanks.','wealth']
+    ],
+    budgets:[
+      ['Give every rupee a job before it gets creative.','budget'],['Your budget has entered the building. 👀','budget'],['A limit is just a plan wearing a seatbelt.','fact'],['Budgeting is deciding first so impulse does not decide later.','fact'],['The budget is not angry. The budget is evidence. 😂','funny'],['Your spending has boundaries now.','budget'],['A budget is a promise to future-you.','goal'],['Numbers negotiate badly. Rules work better.','budget'],['A little restraint now beats a lot of regret later.','fact'],['The month still has receipts left to write.','budget'],['Your budget deserves fewer plot twists.','funny'],['Track it, then decide. Not the other way around.','budget'],['The best budget is one you can actually follow.','fact'],['Budget first. Excuses later. 😌','budget'],['A category limit is not a personal attack.','funny']
+    ],
+    analytics:[
+      ['Numbers do not lie. They merely expose our decisions.','fact'],['Here lies the evidence. 🧾','transaction'],['Charts: because tables needed better lighting. 😂','funny'],['Your spending has a storyline. We are reading it.','analytics'],['Patterns are where the useful stuff hides.','fact'],['One month is a snapshot. Trends tell the story.','fact'],['The chart is just your habits wearing graph paper.','funny'],['Averages are humble. Outliers are loud.','fact'],['Data is less scary when it is yours.','analytics'],['This is where guesses become numbers.','fact'],['Your past spending just submitted a report.','analytics'],['The graph has receipts. Convenient.','transaction'],['A trend is a pattern asking for attention.','fact'],['Numbers make excellent witnesses.','fact'],['Analytics: the polite way to investigate yourself. 😂','funny']
+    ],
+    transactions:[
+      ['The receipt museum is open. 🧾','transaction'],['Every transaction tells a tiny story.','transaction'],['Money moved. Here is the paper trail.','transaction'],['Three taps and we know where the money went.','money'],['A recorded transaction is a future headache avoided.','fact'],['The ledger remembers what the brain forgets.','fact'],['Recent activity, less mystery.','transaction'],['Your wallet left clues. We collected them.','funny'],['Every line is one less "where did that go?"','money'],['The paper trail is suspiciously thorough. 👀','funny'],['Receipts: tiny documents with enormous opinions.','funny'],['History is useful when it has amounts attached.','fact'],['The transaction list never sleeps.','transaction'],['Money moved. At least it cannot deny it now. 😂','funny'],['Clean records make future-you faster.','fact']
+    ],
+    more:[
+      ['Settings are hiding because you only need them sometimes.','money'],['Your money control room is open. 🚀','money'],['One place for the money mess. 😅','funny'],['Numbers behaving themselves for once. 🎲','funny'],['A clean tracker for a messy world.','money'],['The boring controls are safely out of sight.','funny'],['This is where the app gets configurable.','money'],['Rarely touched settings belong exactly here.','fact'],['Control without clutter.','money'],['The dashboard runs on receipts and mild optimism.','funny']
+    ],
+    action:[
+      ['Saved. Future-you has the receipt. ✅','action'],['Locked in. The numbers got the memo.','action'],['Done. Tiny admin victory. 🏆','action'],['Recorded. No archaeology required later.','action'],['Saved. The chaos is officially documented.','action'],['Updated. The ledger noticed.','action'],['Added. Another financial breadcrumb.','action'],['Done. Very responsible of you. 😌','action'],['Noted. Your future self owes you one.','action'],['Saved. Your wallet may relax now.','action']
+    ],
+    backup:[
+      ['Backup done. Future-you says thanks. ☁️','backup'],['Your data now has an escape plan.','backup'],['Backup saved. Disaster has been mildly inconvenienced. 😂','backup'],['One backup closer to sleeping peacefully.','backup'],['Data packed. Ready for the next phone.','backup'],['Your future restore button just got happier.','backup'],['One copy in the cloud beats one copy in your memory.','fact'],['Backups are boring right up until they are heroic.','funny'],['A backup you never test is still a little suspicious.','fact'],['Good backups are quiet insurance.','fact']
+    ],
+    empty:[
+      ['Nothing here yet. Peaceful. Suspicious. 🫠','funny'],['A rare moment when your wallet is quiet.','funny'],['Blank slate. Dangerous amount of optimism. 😂','funny'],['No records yet. The ledger is waiting.','transaction'],['Nothing to analyse yet. A suspiciously clean start.','funny'],['Fresh screen. Fresh opportunity.','goal'],['Zero records. Zero excuses. 😌','funny']
+    ],
+    facts:[
+      ['Compound growth rewards time more than excitement.','fact'],['Diversification reduces reliance on one outcome.','fact'],['Liquidity is useful because plans occasionally misbehave.','fact'],['A good emergency fund is designed for bad surprises.','fact'],['Tracking spending changes behaviour because visibility changes decisions.','fact'],['Net worth is assets minus liabilities, adjusted for what you are owed and owe.','fact'],['A budget is a forward-looking plan; a transaction is backward-looking evidence.','fact'],['Consistency usually beats occasional bursts of financial heroics.','fact'],['Fees are small until they repeat for years.','fact'],['Risk and return are roommates who argue constantly.','funny'],['A long horizon can make short-term noise less important.','fact'],['Cash has a job too: liquidity.','fact'],['An investment record is more useful when its date is clear.','fact'],['Past performance is history, not a promise.','fact'],['The best system is the one you actually keep updated.','fact']
+    ]
+  };
+  const flat=Object.fromEntries(Object.entries(LIB).map(([k,v])=>[k,v.map(x=>x[0])]));
+  const getStore=()=>{try{return JSON.parse(localStorage.getItem(PKEY)||'{}')}catch{return {}}};
+  const setStore=v=>{try{localStorage.setItem(PKEY,JSON.stringify(v))}catch{}};
+  const recent=()=>{const s=getStore();return Array.isArray(s.recent)?s.recent:[]};
+  const remember=(id)=>{const s=getStore();s.recent=Array.isArray(s.recent)?s.recent:[];s.recent.push(id);if(s.recent.length>24)s.recent=s.recent.slice(-24);s.last=id;s.updatedAt=Date.now();setStore(s)};
+  const hashText=t=>{let h=0;for(let i=0;i<t.length;i++)h=((h<<5)-h+t.charCodeAt(i))|0;return Math.abs(h)};
+  function select(list,kind){
+    if(!list?.length)return {text:'',visual:'🧠',kind:kind||'default'};
+    const seen=new Set(recent());
+    const candidates=list.filter(x=>!seen.has(x[0]));
+    const pool=candidates.length?candidates:list;
+    const x=pool[Math.floor(Math.random()*pool.length)];
+    remember(hashText(x[0]));
+    const cat=x[1]||kind||'default';
+    const visuals=VISUALS[cat]||VISUALS[kind]||VISUALS.default;
+    return {text:x[0],visual:visuals[Math.floor(Math.random()*visuals.length)],kind:cat};
+  }
+  function ctx(){try{return window.PersonalizationEngine?.context?.()||{mode:'money',page:'home',bucket:'money',spendToday:0,txCount:0,name:'Abhishek'}}catch{return {mode:'money',page:'home',bucket:'money',spendToday:0,txCount:0,name:'Abhishek'}}}
+  function contextualLibrary(c,reason){
+    if(reason==='action') return LIB.action;
+    if(reason==='backup') return LIB.backup;
+    if(reason==='empty') return LIB.empty;
+    if(reason==='facts') return LIB.facts;
+    if(c.bucket==='budgets'||c.page==='budgets')return LIB.budgets;
+    if(c.bucket==='analytics'||c.page==='analytics')return LIB.analytics;
+    if(c.bucket==='transactions'||c.page==='transactions')return LIB.transactions;
+    if(c.bucket==='more'||c.page==='more')return LIB.more;
+    return c.mode==='wealth'?LIB.wealth:LIB.money;
+  }
+  function getCurrent(reason){
+    const c=ctx(), key=[c.mode,c.page,c.spendToday,c.txCount,reason||'context'].join('|');
+    const s=getStore();
+    if(s.lastKey===key && s.lastText)return {text:s.lastText,visual:s.lastVisual||'🧠',kind:s.lastKind||'money',key};
+    const x=select(contextualLibrary(c,reason),c.mode==='wealth'?'wealth':'money');
+    s.lastKey=key;s.lastText=x.text;s.lastVisual=x.visual;s.lastKind=x.kind;setStore(s);
+    return {...x,key};
+  }
+  function applyPreview(x){
+    const ids=['globalMessage','surprisePreview','wealthSurprisePreview','v20BrainTeaser-m','v20BrainTeaser-w'];
+    ids.forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=x.text});
+    const text=document.getElementById('brainFoodText');if(text)text.textContent=x.text;
+    const icon=document.getElementById('brainFoodIcon');if(icon)icon.textContent=x.visual;
+    const tag=document.getElementById('brainFoodTag');if(tag){tag.textContent=ctx().mode==='wealth'?'WEALTH BRAIN FOOD':'MONEY BRAIN FOOD'}
+    const big=document.getElementById('brainFoodIcon'); if(big){big.classList.add('v202-brain-visual');}
+    const smalls=document.querySelectorAll('.v202-teaser-icon'); smalls.forEach(e=>e.textContent=x.visual);
+  }
+  function headerProfile(){try{return localStorage.getItem('spend_tracker_profile_name')||'Abhishek'}catch{return 'Abhishek'}}
+  function updateHeader(){
+    const c=ctx(), p=headerProfile();
+    const title=document.getElementById('appTitle'), sub=document.getElementById('appSubtitle');
+    const titlePool=c.mode==='wealth'?[`${p}'s Wealth 📈`,`Future-You Fund 📊`,`${p}'s Wealth Desk 🧠`]:[`${p}'s Money 💸`,`Money HQ 💰`,`${p}'s Wallet HQ 🧾`];
+    const s=getStore(), hour=new Date().getHours();
+    const titleChoice=titlePool[(hashText(String(hour)+c.mode+(c.page||'')))%titlePool.length];
+    if(title)title.textContent=titleChoice;
+    if(sub){
+      if(c.mode==='wealth') sub.textContent=c.spendToday>0?'The long game is still the game. 📈':'Building future-you money, one record at a time.';
+      else sub.textContent=c.spendToday>0?'Keeping the money mess measurable. 😌':'Ready when the next rupee moves. 👀';
+    }
+  }
+  function updateSectionMicrocopy(x){
+    const map={mhome:['.money-page #mhome .section .small'],mtransactions:['.money-page #mtransactions .section .small'],manalytics:['.money-page #manalytics .section .small'],mbudgets:['.money-page #mbudgets .section button'],whome:['.wealth-page #whome .wealth-section-note'],wtransactions:['.wealth-page #wtransactions .small'],wanalytics:['.wealth-page #wanalytics .small']};
+    const c=ctx(); const key=c.mode==='wealth'?'w'+c.page:'m'+c.page; const sels=map[key]||[]; sels.forEach(sel=>document.querySelectorAll(sel).forEach(e=>{if(e.dataset.v202Keep==='1')return;e.dataset.v202Keep='1';}));
+  }
+  function renderTeaser(){
+    document.querySelectorAll('.v20-brain-teaser').forEach(teaser=>{
+      if(teaser.dataset.v202Done==='1')return;
+      teaser.dataset.v202Done='1';
+      const copy=teaser.querySelector('.teaser-copy');
+      const dice=teaser.querySelector('.v20-brain-dice');
+      if(copy){const oldP=copy.querySelector('p'); if(oldP)oldP.classList.add('v202-teaser-preview')}
+      if(dice){dice.innerHTML='<span class="v202-teaser-icon">🎲</span>'}
+    });
+  }
+  window.PersonalizationEngineV202={
+    next:function(reason){const x=getCurrent(reason||'context');applyPreview(x);return x},
+    context:ctx,
+    library:flat,
+    visualLibrary:VISUALS,
+    getState:getStore
+  };
+  window.showSurpriseMessage=function(){
+    const c=ctx();
+    const x=select(contextualLibrary(c,'context'),c.mode==='wealth'?'wealth':'money');
+    const s=getStore();s.lastKey='manual|'+Date.now();s.lastText=x.text;s.lastVisual=x.visual;s.lastKind=x.kind;setStore(s);
+    applyPreview(x);
+  };
+  function v202Refresh(reason){
+    renderTeaser();
+    const x=getCurrent(reason||'context');
+    applyPreview(x);
+    updateHeader();
+  }
+  // Extend legacy refresh without replacing its financial work.
+  const oldRefresh=window.refresh;
+  if(oldRefresh&&!oldRefresh.__v202wrapped){
+    const wrapped=function(){const r=oldRefresh.apply(this,arguments);setTimeout(()=>v202Refresh('refresh'),0);return r};
+    wrapped.__v202wrapped=true;window.refresh=wrapped;
+  }
+  const oldSwitch=window.switchApp;
+  if(oldSwitch&&!oldSwitch.__v202wrapped){
+    const wrapped=function(){const r=oldSwitch.apply(this,arguments);setTimeout(()=>v202Refresh('switch'),20);return r};wrapped.__v202wrapped=true;window.switchApp=wrapped;
+  }
+  const oldOpenMoney=window.openMoneyPage;
+  if(oldOpenMoney&&!oldOpenMoney.__v202wrapped){window.openMoneyPage=function(){const r=oldOpenMoney.apply(this,arguments);setTimeout(()=>v202Refresh('nav'),20);return r};window.openMoneyPage.__v202wrapped=true}
+  const oldOpenWealth=window.openWealthPage;
+  if(oldOpenWealth&&!oldOpenWealth.__v202wrapped){window.openWealthPage=function(){const r=oldOpenWealth.apply(this,arguments);setTimeout(()=>v202Refresh('nav'),20);return r};window.openWealthPage.__v202wrapped=true}
+  // Keep Brain Food visuals local and mode-aware.
+  const oldOpenBrain=window.openBrainFood;
+  if(oldOpenBrain&&!oldOpenBrain.__v202wrapped){window.openBrainFood=function(){const r=oldOpenBrain.apply(this,arguments);setTimeout(()=>{const x=select(contextualLibrary(ctx(),'context'),ctx().mode==='wealth'?'wealth':'money');applyPreview(x)},10);return r};window.openBrainFood.__v202wrapped=true}
+  // Initial + passive live refresh. Only changes when the contextual signature changes.
+  let lastSig='';
+  function live(){
+    const c=ctx(),sig=[c.mode,c.page,c.spendToday,c.txCount].join('|');
+    if(sig!==lastSig){lastSig=sig;v202Refresh('live')}
+  }
+  function init(){v202Refresh('open');setInterval(live,1500)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+</body>
+</html>
