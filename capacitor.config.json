@@ -1,7 +1,7 @@
 {
   "appId": "com.onlinabhi.spendtracker",
   "appName": "Spend Tracker",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   }
