@@ -1,10 +1,10 @@
-# Spend Tracker V21.01 baseline hardening
+# Spend Tracker V21.02 baseline hardening
 
-V21.01 is a test-hardening release built on the V21 local-first architecture. The financial state remains the source of truth in `localStorage`; presentation/controllers are layered around it.
+V21.02 is a surgical test-hardening release built on the V21 local-first architecture. The financial state remains the source of truth in `localStorage`; presentation/controllers are layered around it.
 
 ## Replaceable domains
 - `assets/app-legacy.js`: compatibility/data implementation retained during migration.
-- `assets/v21.js`: V21 shell, controllers, route persistence, theme application, search, backup adapters, progress rendering, profile/settings presentation and fun-engine orchestration.
+- `assets/v21.js`: V21 shell, controllers, route persistence, theme application, search, backup adapters, progress rendering, cross-screen controllers and fun-engine orchestration.
 - `src/features/fun-library.js`: content-only fun library. Add/replace entries and language packs here without changing money/wealth logic.
 - `assets/styles.css`: semantic visual system and V21.01 hardening.
 - `sw.js`: PWA cache shell. Cache key is versioned so old service-worker assets do not silently survive a deployment.
@@ -36,7 +36,7 @@ Theme selection and appearance are separate dimensions:
 - Components consume semantic tokens instead of deciding their own theme colors.
 
 ## Profile contract
-Profile is global. Name, email and photo are one logical record. Settings shows a read-only profile card first and exposes an explicit edit state. Avatars are synchronized after refresh and across Money/Wealth surfaces.
+Profile is global. Name, email and photo are one logical record. Settings keeps the previously approved profile/settings structure; V21.02 does not rewrite the Settings UI. Avatars are synchronized after refresh and across Money/Wealth surfaces.
 
 ## Backup contract
 - Full backup: portable JSON containing Money, Wealth, profile, personalization and settings.
@@ -54,7 +54,7 @@ The engine is presentation-only and has no ownership of financial state.
 - Dice requests use the same library.
 - Personalization toggles filter content at runtime.
 - Locale selection supports a language map with English fallback. Adding Hindi or future languages requires library entries, not financial-code edits.
-- The floating dice controller owns only position/animation and calls the engine.
+- The floating dice controller owns only position/animation and calls the engine. It can be manually dragged, pauses after manual placement, and avoids interactive controls when auto-moving.
 
 ## Web refresh contract
 The current Money/Wealth page is encoded in the URL hash (`#money:transactions`, `#wealth:analytics`, etc.). Refresh therefore restores the same section in the webapp. This is intentionally independent of native-app routing.
