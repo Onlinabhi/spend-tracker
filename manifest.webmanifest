@@ -1,7 +1,7 @@
 {
-  "name":"Spend Tracker V21.01",
+  "name":"Spend Tracker V21.0",
   "short_name":"Spend Tracker",
-  "start_url":"./index.html#money:home",
+  "start_url":"./index.html",
   "scope":"./",
   "display":"standalone",
   "background_color":"#0b1118",

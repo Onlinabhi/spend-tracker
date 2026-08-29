@@ -1,15 +1,12 @@
-# Spend Tracker V21.02
+# Spend Tracker V21
 
-Local-first Money + Wealth PWA test build.
+Local-first personal finance app for Money + Wealth tracking.
 
-## V21.02 focus
-This build hardens the V21 architecture before production merge. Financial state remains local-first and backward compatible. Feature content and controllers are separated so future updates can target one domain without rewriting unrelated code.
+## Run
+Open `index.html` in a browser for the local web build. For production/PWA use the existing HTTPS/hosted workflow. Android packaging uses the existing Capacitor setup in GitHub.
 
-### Key modules
-- `assets/app-legacy.js` compatibility/data layer
-- `assets/v21.js` application controllers and V21 presentation orchestration
-- `src/features/fun-library.js` replaceable fun-content/language library
-- `assets/styles.css` semantic theme and UI system
-- `sw.js` versioned PWA cache
+## Architecture
+See `ARCHITECTURE-V21.md`. The legacy compatibility layer in `assets/app-legacy.js` preserves V20 behavior and storage while V21 domains are progressively isolated under `src/`.
 
-Do not treat `v21-test` as production. The approved Money/Wealth and Settings structure is preserved; this release is intentionally surgical. Test the full Money + Wealth flow before merging into `main`.
+## Data safety
+Do not uninstall/clear app data when testing an Android update. The V20 storage boundary is intentionally preserved. Always export a backup before testing a major migration.

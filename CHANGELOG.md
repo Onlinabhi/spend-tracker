@@ -1,20 +1,11 @@
-# Spend Tracker V21.02
+# Spend Tracker V21
 
-## Surgical structural rollback
-- Restored the previously approved Settings/profile structure by removing the V21.01 view-first Settings rewrite.
-- Preserved the V21.01 financial, search, theme, backup, routing, profile-sync, progress and Fun Engine fixes.
-- Stopped normal page scrolling from closing the Settings overlay.
-- Kept the redundant Wealth Net Worth quick-link removal and Portfolio naming fix.
-
-## Floating dice
-- Kept the existing floating dice design.
-- Added direct drag/reposition control.
-- Added collision avoidance so automatic movement does not intentionally overlap interactive controls.
-- Pauses automatic movement after manual placement.
-- Clicking/tapping the dice opens Brain Food through the modular Fun Engine.
-- No multilingual UI was added; the language-map contract remains ready for future library expansion.
-
-## Validation
-- JavaScript syntax checked with Node.
-- Service-worker cache key bumped to V21.02.
-- This build is for `v21-test`; do not merge to `main` until the phone regression pass is complete.
+## V21 baseline
+- New global profile/settings entry point replaces standalone More navigation.
+- Four-item bottom navigation: Home, Transactions, Analytics, Goals.
+- Responsive width guardrails to prevent horizontal overflow.
+- Modernized cards/navigation and transaction interaction surface.
+- Five global color-theme presets.
+- Separated architecture contracts for storage, navigation, overlays, themes, backup and personalization.
+- Expanded fun-message library isolated from financial logic.
+- Existing V20 local storage key retained for compatibility.
