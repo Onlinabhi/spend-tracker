@@ -1,19 +1,17 @@
-# Spend Tracker V21
+# Spend Tracker V21.01
 
-## Architecture/UI baseline
-- Replaced standalone More navigation with global profile/settings entry.
-- Added modular V21 shell and reusable theme/message libraries.
-- Added five preset color themes with global variables.
-- Modernized Money Home with balance, quick stats, recent-money search and last-7-days focus.
-- Modernized Wealth Home, Wealth Analytics, Wealth Activity and Goals.
-- Added richer transaction preview details with Edit/Delete actions.
-- Added global modal dismissal and accordion single-open behavior.
-- Added viewport-width protections against horizontal layout drift.
-- Preserved the existing localStorage data keys and core business logic for compatibility.
-
-## Modular files
-- `js/fun-library.js` is the message library.
-- `js/theme-library.js` is the theme library.
-- `css/v21.css` is the V21 presentation layer.
-- `js/v21.js` is the V21 shell/adapter layer.
-- `js/app.js` remains the compatibility core until the data/business services are fully split.
+## Test hardening
+- Fixed theme contrast and semantic light/dark theme surfaces.
+- Personal transfers now count as Money spending across totals, analytics, trends and budgets.
+- Fixed mobile form dismissal caused by scroll while focusing inputs.
+- Improved Money search to match text, amount and date.
+- Strengthened category and goal progress visualisation.
+- Preserved Money/Wealth section on web refresh with hash routing.
+- Synchronized profile photo/avatar globally.
+- Redesigned Settings profile as view-first with explicit edit mode.
+- Removed redundant Wealth Net Worth quick link; retained Portfolio/Investments entry.
+- Added distinct Day/Night/Auto controls and visible theme-color previews.
+- Added full JSON backup, CSV backup, CSV/JSON restore and merge, plus user-controlled cloud share.
+- Added modular transaction-triggered Fun Engine and floating dice controller.
+- Added language-map architecture with English/Hindi support and English fallback.
+- Fixed PWA cache manifest to remove a missing module and bumped service-worker cache version.

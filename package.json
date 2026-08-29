@@ -1,17 +1,10 @@
 {
-  "name": "spend-tracker-v20-2",
-  "version": "20.2.0",
+  "name": "spend-tracker-v21",
+  "version": "21.1.0",
   "private": true,
+  "description": "Spend Tracker V21 local-first Money + Wealth app",
   "scripts": {
-    "build": "echo No web build required",
-    "cap:add": "npx cap add android",
-    "cap:sync": "npx cap sync android"
-  },
-  "dependencies": {
-    "@capacitor/core": "^7.4.3",
-    "@capacitor/android": "^7.4.3"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
+    "check": "node --check assets/app-legacy.js && node --check assets/v21.js",
+    "build": "echo 'Static web build: no compilation required'"
   }
 }

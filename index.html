@@ -1,268 +1,2039 @@
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
-<meta content="#18202d" name="theme-color"/>
-<meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="default" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest" rel="manifest"/>
-<meta content="Spend Tracker V21" name="application-name"/>
-<meta content="yes" name="mobile-web-app-capable"/>
-<meta content="Spend Tracker" name="apple-mobile-web-app-title"/>
-<link href="icons/icon-192.svg" rel="apple-touch-icon"/>
-<link href="icons/icon-192.svg" rel="icon" sizes="192x192" type="image/png"/>
-<link href="icons/icon-512.svg" rel="icon" sizes="512x512" type="image/png"/>
-<title>Spend Tracker V21</title>
-<link href="css/base.css" rel="stylesheet"/><link href="css/v21.css" rel="stylesheet"/></head>
-<body>
-<div class="app">
-<header class="top"><div class="brand"><h1 id="appTitle">Abhishek's Money</h1><p id="appSubtitle">Your money, in one place.</p><div aria-live="polite" class="global-message" id="globalMessage"></div></div><div class="header-actions"><button aria-hidden="true" class="theme v21-hidden-theme" id="themeBtn" tabindex="-1">☾</button><button aria-label="Open profile and settings" class="profile-nav" id="profileNavButton" onclick="openSettingsPanel()"><div class="profile-avatar header-avatar" id="headerProfileAvatar">A</div></button></div></header>
-<div class="mode"><button class="money-active" id="moneyMode" onclick="switchApp('money')">Money</button><button id="wealthMode" onclick="switchApp('wealth')">Wealth</button></div>
-<!-- MONEY APP -->
-<div class="app-shell money-page" id="moneyApp">
-<section class="screen active" id="mhome"><div class="v21-balance-card"><div class="v21-balance-head"><div class="v21-eyebrow">Current balance</div></div><div class="v21-balance-value" id="mBalance">₹0</div><div class="v21-balance-stats"><div class="v21-mini-stat"><b id="mIncome">₹0</b><span>Income</span></div><div class="v21-mini-stat"><b id="mTotal">₹0</b><span>Expenses</span></div><div class="v21-mini-stat"><b id="mCount">0</b><span>Transactions</span></div></div></div><div class="v21-quick-grid"><div class="v21-stat-card"><b id="mToday">₹0</b><span>Today</span></div><div class="v21-stat-card"><b id="mWeek">₹0</b><span>Last 7 days</span></div><div class="v21-stat-card"><b id="mAvg">₹0</b><span>Daily avg</span></div><div class="v21-stat-card"><b id="mBig">₹0</b><span>Biggest spend</span></div></div><div class="v21-finder card"><div class="v21-finder-row"><input aria-label="Search recent money" class="search" id="mHomeSearch" oninput="renderHomeFeed()" placeholder="Search recent money"/><select aria-label="Home period" class="selectish" id="mHomeScope" onchange="renderHomeFeed()"><option value="7">Last 7 days</option><option value="1">Today</option><option value="30">Last 30 days</option></select></div><div class="small">Quick look only. Full history lives in Transactions.</div></div><div class="section v21-section-head"><h2>Recent money</h2><button onclick="navigate('transactions')">See all →</button></div><div id="mRecent"></div><div class="v21-legacy-hidden"><select id="trendPreset"></select><div id="mBars"></div><div id="trendSummary"></div><span id="trendCaption"></span><span id="trendTotal"></span><span id="trendTotalLabel"></span></div></section>
-<section class="screen" id="mtransactions"><div class="section"><h2>Transactions</h2><span class="small">Money</span></div><input class="search" id="mSearch" oninput="renderMoneyTransactions()" placeholder="Search description, category, person or method"/><div class="filters"><button class="active" onclick="setMoneyFilter('all',this)">All</button><button onclick="setMoneyFilter('expense',this)">Expenses</button><button onclick="setMoneyFilter('income',this)">Income</button><button onclick="setMoneyFilter('transfer',this)">Transfers</button></div><div id="mTxList"></div></section>
-<section class="screen" id="manalytics"><div class="section"><h2>Money Analytics</h2><span class="small">Monthly</span></div><div class="card"><div class="chart-head"><b id="mAnTotal">₹0</b><span class="small">spent</span></div><div id="mCats"></div></div><div class="section"><h2>Payment usage</h2></div><div class="card" id="mMethods"></div></section>
-<section class="screen" id="mbudgets"><div class="section"><h2>Goals &amp; budgets</h2><button onclick="openBudget()">Edit plan</button></div><div class="card"><div class="chart-head"><b id="budgetSpent">₹0</b><span class="small" id="budgetLabel">of ₹0</span></div><div class="progress" style="margin-top:10px"><i id="budgetBar" style="width:0"></i></div><div class="small" id="budgetText" style="margin-top:7px"></div></div><div class="section"><h2>Category budgets</h2></div><div id="budgetCats"></div></section>
-<section class="screen v21-legacy-settings-source" id="mmore">
-<div class="settings-head"><div><h2>More</h2><div class="small" id="moreMessage">Your financial command center. 🎛️</div></div><button aria-label="Show a surprise message" class="dice-button" id="diceButton" onclick="showSurpriseMessage()">🎲</button></div>
-<div class="card identity-card"><div class="identity-main"><button aria-label="Change profile photo" class="avatar-button" onclick="triggerProfilePhoto()"><div class="profile-avatar large" id="profileAvatar">A</div><span>＋</span></button><div><div class="identity-name" id="profileNameLabel">Abhishek</div><div class="identity-sub" id="identitySub">Your tracker. Your rules. ✨</div></div></div><button class="primary full" onclick="openSettingsPanel()">⚙️ Settings</button></div>
-<div class="card surprise-card"><div><b>Today's tiny chaos</b><div class="surprise-preview" id="surprisePreview">🎲 Tap for something unexpected.</div></div><button class="secondary" onclick="showSurpriseMessage()">Roll 🎲</button></div>
-<div class="card settings-list-card">
-<details><summary>👤 Profile</summary><div class="settings-body"><div class="profile-fields"><div class="profile-field"><label>Name</label><input autocomplete="name" id="profileNameInput" placeholder="Your name"/></div><div class="profile-field"><label>Backup email</label><input autocomplete="email" id="profileEmailInput" placeholder="you@example.com" type="email"/></div><div class="profile-field"><label>Profile photo</label><input accept="image/*" id="profilePhotoInput" onchange="setProfilePhoto(this)" type="file"/></div></div><div class="profile-actions"><button class="primary" onclick="saveProfile()">Save profile</button><button class="secondary" onclick="removeProfilePhoto()">Remove photo</button></div></div></details>
-<details><summary>🎨 Appearance &amp; text</summary><div class="settings-body"><div class="small">Theme</div><div class="savebar"><button class="secondary" onclick="setThemePreference(false)">☀ Day</button><button class="secondary" onclick="setThemePreference(true)">☾ Night</button><button class="secondary" onclick="setThemePreference(null)">Auto</button></div><div class="small" style="margin-top:12px">Text size</div><div class="text-scale-row"><button id="textSmall" onclick="setTextScale('small')">Small</button><button id="textNormal" onclick="setTextScale('normal')">Normal</button><button id="textLarge" onclick="setTextScale('large')">Large</button></div></div></details>
-<details><summary>🧩 Money categories</summary><div class="settings-body"><div id="mCatsManage"></div><button class="link" onclick="openCategory()">＋ Add category</button></div></details>
-<details><summary>💳 Payment methods</summary><div class="settings-body"><div id="mMethodsManage"></div><button class="link" onclick="openMethod()">＋ Add payment method</button></div></details>
-<details><summary>🏦 Income accounts</summary><div class="settings-body"><div id="mIncomeManage"></div><button class="link" onclick="openIncomeAccount()">＋ Add account</button></div></details>
-<details><summary>💾 Backup &amp; transfer</summary><div class="settings-body"><div class="small">One portable JSON backup. No cloud API, no silent uploads.</div><div class="more-grid" style="margin-top:10px"><button class="more-action" onclick="backupData()">⬇ Backup<span>Update your backup file</span></button><button class="more-action" onclick="importData()">⬆ Restore<span>Replace current data</span></button><button class="more-action" onclick="mergeData()">＋ Merge<span>Combine records</span></button><button class="more-action" onclick="exportCSV()">▤ CSV<span>Money transactions</span></button></div></div></details>
-<details><summary>🧠 Personalization</summary><div class="settings-body"><div class="small">The app adapts messages and headers using your current screen, mode, time and financial state.</div><div class="personal-options"><label><input checked="" id="personalEnabled" onchange="setPersonalization('enabled',this.checked)" type="checkbox"/> Personalized experience</label><label><input checked="" id="personalFunny" onchange="setPersonalization('funny',this.checked)" type="checkbox"/> Funny / sarcastic lines</label><label><input checked="" id="personalFacts" onchange="setPersonalization('facts',this.checked)" type="checkbox"/> Finance facts</label></div></div></details>
-<details><summary>🧨 Reset app data</summary><div class="settings-body"><div class="small">Deletes local Money + Wealth data. Backup first unless chaos is the goal.</div><button class="secondary danger-wide" onclick="resetProfile()">Reset all data</button></div></details>
-</div>
-</section>
-</div>
-<!-- WEALTH APP -->
-<div class="app-shell wealth-page" id="wealthApp" style="display:none">
-<section class="screen active" id="whome"><div class="v21-wealth-hero"><div class="v21-eyebrow">Total net worth</div><div class="v21-wealth-value" id="wNetWorth">₹0</div><div class="small" id="wDelta">Assets · liabilities · money owed</div></div><div class="v21-wealth-stat-grid"><div class="v21-stat-card"><span>Assets</span><b id="wAssets">₹0</b></div><div class="v21-stat-card"><span>Liabilities</span><b id="wLiab">₹0</b></div><div class="v21-stat-card"><span>Owed to you</span><b id="wLend">₹0</b></div><div class="v21-stat-card"><span>You owe</span><b id="wBorrow">₹0</b></div></div><div class="section"><h2>Portfolio allocation</h2><span class="small">Current</span></div><div class="card v21-portfolio-card"><div class="mix" id="wMix"></div><div class="legend" id="wLegend"></div></div><div class="section"><h2>Assets</h2><button onclick="openWealthPage('networth')">View all →</button></div><div id="wAssetPreview"></div><div class="section"><h2>Liabilities</h2><button onclick="openWealthPage('networth')">View all →</button></div><div id="wLiabPreview"></div><div class="section"><h2>Money owed</h2><button onclick="openWealthPage('debts')">View all →</button></div><div id="wDebtPreview"></div><div class="section"><h2>Goals</h2><button onclick="openWealthPage('budgets')">Manage →</button></div><div id="wMilestonePreview"></div></section>
-<section class="screen" id="wnetworth"><div class="section"><h2>Net Worth</h2><span class="small">Wealth records</span></div><div class="wealth-hero"><small>Current net worth</small><div class="worth" id="nwTotal">₹0</div><div class="wealth-delta">All wealth records combined.</div></div>
-<div class="section"><h2>Fixed Deposits</h2><button onclick="openFd()">+ Add</button></div><div id="fdList"></div>
-<div class="section"><h2>Mutual Funds</h2><button onclick="openMf()">+ Add</button></div><div id="mfList"></div>
-<div class="section"><h2>Stocks / ETFs</h2><button onclick="openStock()">+ Add</button></div><div id="stockList"></div>
-<div class="section"><h2>EPFO</h2><button onclick="openEpfo()">Edit</button></div><div class="card" id="epfoCard"></div>
-<div class="section"><h2>Loans</h2><button onclick="openLoan()">+ Add</button></div><div id="loanList"></div>
-<div class="section"><h2>Other Assets</h2><button onclick="openAsset()">+ Add</button></div><div id="otherAssetList"></div>
-<div class="section"><h2>Net worth history</h2></div><div class="card" id="worthHistory"></div></section>
-<section class="screen" id="wtransactions"><div class="section"><div><h2>Wealth activity</h2><span class="small">Investments, liabilities and adjustments</span></div></div><div class="card v21-timeline" id="wealthActivity"></div></section>
-<section class="screen wealth-analytics-screen" id="wanalytics"><div class="section"><div><h2>Wealth Analytics</h2><span class="small">Where your wealth sits and how it moves</span></div><span class="wealth-pill">LIVE</span></div><div class="v21-wealth-kpi"><span>Current net worth</span><b id="waNet">₹0</b><div class="v21-kpi-bar"><i></i></div></div><div class="v21-wealth-stat-grid"><div class="v21-stat-card"><span>Assets</span><b id="waAssets">₹0</b></div><div class="v21-stat-card"><span>Liabilities</span><b id="waLiab">₹0</b></div><div class="v21-stat-card"><span>Owed to you</span><b id="waLend">₹0</b></div><div class="v21-stat-card"><span>You owe</span><b id="waBorrow">₹0</b></div></div><div class="section"><h2>Allocation</h2><span class="small">Current value</span></div><div class="card" id="waAlloc"></div><div class="section"><h2>Balance breakdown</h2></div><div class="card" id="waBreak"></div><span class="v21-legacy-hidden" id="waAllocTotal"></span></section>
-<section class="screen" id="wdebts"><div class="section"><div><h2>Money owed</h2><span class="small">Receivable and payable balances</span></div><button class="wealth-link" onclick="openDebt()">+ Add</button></div><div class="wealth-dashboard-card"><div class="goal-kpi"><span>Owed to you</span><b id="wdLend">₹0</b></div><div class="goal-kpi"><span>You owe</span><b id="wdBorrow">₹0</b></div></div><div id="debtList"></div></section>
-<section class="screen" id="wbudgets"><div class="section"><div><h2>Wealth goals</h2><span class="small">Targets and milestones</span></div><button class="wealth-link" onclick="openMilestone()">+ Add</button></div><div class="v21-goal-summary"><div><span>Active goals</span><b id="wGoalCount">0</b></div><div><span>Overall progress</span><b id="wGoalProgress">0%</b></div></div><div id="wealthBudgetMilestones"></div></section>
-<section class="screen v21-legacy-settings-source" id="wmore">
-<div class="settings-head"><div><h2>More</h2><div class="small" id="wealthMoreMessage">Your wealth corner. 📈</div></div><button aria-label="Show a surprise message" class="dice-button" onclick="showSurpriseMessage()">🎲</button></div>
-<div class="card identity-card"><div class="identity-main"><button aria-label="Change profile photo" class="avatar-button" onclick="triggerProfilePhoto()"><div class="profile-avatar large" id="wealthProfileAvatar">A</div><span>＋</span></button><div><div class="identity-name" id="wealthProfileNameLabel">Abhishek</div><div class="identity-sub">Building future-you money. 🧠</div></div></div><button class="primary full" onclick="openSettingsPanel()">⚙️ Settings</button></div>
-<div class="card surprise-card"><div><b>Wealth thought</b><div class="surprise-preview" id="wealthSurprisePreview">🎲 Tap for something unexpected.</div></div><button class="secondary" onclick="showSurpriseMessage()">Roll 🎲</button></div>
-<div class="card settings-list-card"><details><summary>👤 Profile</summary><div class="settings-body"><div class="profile-fields"><div class="profile-field"><label>Name</label><input autocomplete="name" id="wealthProfileNameInput" placeholder="Your name"/></div><div class="profile-field"><label>Backup email</label><input autocomplete="email" id="wealthProfileEmailInput" placeholder="you@example.com" type="email"/></div><div class="profile-field"><label>Profile photo</label><input accept="image/*" id="wealthProfilePhotoInput" onchange="setProfilePhoto(this)" type="file"/></div></div><div class="profile-actions"><button class="primary" onclick="saveProfile()">Save profile</button><button class="secondary" onclick="removeProfilePhoto()">Remove photo</button></div></div></details><details><summary>🎨 Appearance &amp; text</summary><div class="settings-body"><div class="small">Theme</div><div class="savebar"><button class="secondary" onclick="setThemePreference(false)">☀ Day</button><button class="secondary" onclick="setThemePreference(true)">☾ Night</button><button class="secondary" onclick="setThemePreference(null)">Auto</button></div><div class="small" style="margin-top:12px">Text size</div><div class="text-scale-row"><button id="wealthTextSmall" onclick="setTextScale('small')">Small</button><button id="wealthTextNormal" onclick="setTextScale('normal')">Normal</button><button id="wealthTextLarge" onclick="setTextScale('large')">Large</button></div></div></details><details><summary>💾 Backup &amp; transfer</summary><div class="settings-body"><div class="small">One portable JSON backup. No cloud API, no silent uploads.</div><div class="more-grid" style="margin-top:10px"><button class="more-action" onclick="backupData()">⬇ Backup<span>Update your backup file</span></button><button class="more-action" onclick="importData()">⬆ Restore<span>Replace current data</span></button><button class="more-action" onclick="mergeData()">＋ Merge<span>Combine records</span></button><button class="more-action" onclick="exportCSV()">▤ CSV<span>Money transactions</span></button></div></div></details><details><summary>🧠 Personalization</summary><div class="settings-body"><div class="small">Adaptive headers and messages use your current mode, screen, time and financial state.</div><div class="personal-options"><label><input checked="" id="wealthPersonalEnabled" onchange="setPersonalization('enabled',this.checked)" type="checkbox"/> Personalized experience</label><label><input checked="" id="wealthPersonalFunny" onchange="setPersonalization('funny',this.checked)" type="checkbox"/> Funny / sarcastic lines</label><label><input checked="" id="wealthPersonalFacts" onchange="setPersonalization('facts',this.checked)" type="checkbox"/> Finance facts</label></div></div></details><details><summary>🧨 Reset app data</summary><div class="settings-body"><div class="small">Deletes local Money + Wealth data. Backup first unless chaos is the goal.</div><button class="secondary danger-wide" onclick="resetProfile()">Reset all data</button></div></details></div>
-<div class="card wealth-milestone-card" style="margin-top:12px"><div class="section" style="margin:0 0 6px"><div><h2 style="font-size:16px">Milestones</h2><div class="small">Targets you want to reach</div></div><button onclick="openMilestone()">+ Add</button></div><div id="wealthMilestones"></div></div>
-</section>
-</div>
-</div>
-<button class="fab" id="fab" onclick="contextAdd()">+</button>
-<nav><div class="navinner">
-<button class="navitem money-selected" data-section="home" id="navHome" onclick="navigate('home')"><span>⌂</span>Home</button>
-<button class="navitem" data-section="transactions" id="navTx" onclick="navigate('transactions')"><span>↔</span>Transactions</button>
-<button class="navitem" data-section="analytics" id="navAnalytics" onclick="navigate('analytics')"><span>◔</span>Analytics</button>
-<button aria-label="Goals &amp; budgets" class="navitem" data-section="budgets" id="navBudget" onclick="navigate('budgets')"><span>🎯</span>Goals</button>
-</div></nav>
-<!-- All modals -->
-<div class="modal" id="actionModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="actionTitle">Add transaction</h2><button class="close" onclick="closeModal('actionModal')">✕</button></div><p class="small" id="actionSub"></p><div class="action-grid" id="moneyActions"><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'expense')">💸<b>Expense</b><span>Record spending</span></button><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'income')">💰<b>Income</b><span>Salary, bonus, gift</span></button><button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'transfer')">🤝<b>Personal transfer</b><span>Send money to someone</span></button></div><div class="action-grid" id="wealthActions" style="display:none"><button class="action-card" onclick="closeModal('actionModal');openFd()">🏧<b>Fixed Deposit</b><span>Book or update FD</span></button><button class="action-card" onclick="closeModal('actionModal');openMf()">📈<b>Mutual Fund</b><span>Track current value</span></button><button class="action-card" onclick="closeModal('actionModal');openDebt()">🤝<b>Money Owed</b><span>Lent or borrowed</span></button><button class="action-card" onclick="closeModal('actionModal');openEpfo()">🏢<b>EPFO</b><span>Update or correct balance</span></button><button class="action-card" onclick="closeModal('actionModal');openLoan()">🏦<b>Loan</b><span>Balance and EMI</span></button><button class="action-card" onclick="closeModal('actionModal');openStock()">📊<b>Stocks / ETFs</b><span>Track holdings</span></button><button class="action-card" onclick="closeModal('actionModal');openAsset()">🏠<b>Other asset</b><span>Gold, property, etc.</span></button></div></div></div>
-<div class="modal" id="txModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="txTitle">Add transaction</h2><button class="close" onclick="closeModal('txModal')">✕</button></div><label>Type</label><div class="types"><button id="te" onclick="setTxType('expense')">Expense</button><button id="ti" onclick="setTxType('income')">Income</button><button id="tt" onclick="setTxType('transfer')">Personal transfer</button></div>
-<div id="normalFields"><label>Amount <span class="req">*</span></label><input id="fAmount" inputmode="decimal" min="0" step=".01" type="number"/><label>Category <span class="req">*</span></label><select id="fCat"></select><label id="methodLabel">Payment method <span class="req">*</span></label><select id="fMethod"></select><label id="accountLabel" style="display:none">Credited account</label><select id="fAccount" style="display:none"></select><label>Date</label><input id="fDate" type="date"/><label>Description <span class="small">(optional)</span></label><input id="fDesc"/></div>
-<div id="transferFields" style="display:none"><label>Amount <span class="req">*</span></label><input id="tAmount" inputmode="decimal" min="0" type="number"/><label>To whom <span class="req">*</span></label><input id="tPerson"/><label>Occasion / purpose</label><input id="tOccasion"/><label>Payment method <span class="req">*</span></label><select id="tMethod"></select><label>Date</label><input id="tDate" type="date"/></div>
-<div class="savebar"><button class="secondary" onclick="closeModal('txModal')">Cancel</button><button class="primary" onclick="saveTransaction()">Save</button></div></div></div>
-<div class="modal" id="txActionModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="txActionTitle">Transaction</h2><button class="close" onclick="closeModal('txActionModal')">✕</button></div><div class="small" id="txActionMeta"></div><div class="v21-tx-preview-details" id="txPreviewDetails"></div><div class="tx-action-list"><button onclick="editSelectedTransaction()">✏️ Edit transaction</button><button class="danger" onclick="deleteSelectedTransaction()">🗑️ Delete transaction</button></div></div></div>
-<div class="modal" id="categoryModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="catTitle">Add category</h2><button class="close" onclick="closeModal('categoryModal')">✕</button></div><label>Name</label><input id="catName"/><label>Icon</label><input id="catIcon" maxlength="2" placeholder="✈️"/><div class="savebar"><button class="secondary" onclick="closeModal('categoryModal')">Cancel</button><button class="primary" onclick="saveCategory()">Save</button></div></div></div>
-<div class="modal" id="methodModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="methodTitle">Add payment method</h2><button class="close" onclick="closeModal('methodModal')">✕</button></div><label>Name</label><input id="methodName"/><label>Type</label><select id="methodType"><option>Bank account</option><option>Credit card</option><option>Debit card</option><option>Cash</option><option>UPI</option><option>Wallet</option><option>Other</option></select><div class="savebar"><button class="secondary" onclick="closeModal('methodModal')">Cancel</button><button class="primary" onclick="saveMethod()">Save</button></div></div></div>
-<div class="modal" id="incomeModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Income account</h2><button class="close" onclick="closeModal('incomeModal')">✕</button></div><label>Account name</label><input id="incomeName"/><div class="savebar"><button class="secondary" onclick="closeModal('incomeModal')">Cancel</button><button class="primary" onclick="saveIncomeAccount()">Save</button></div></div></div>
-<div class="modal" id="budgetModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Budgets</h2><button class="close" onclick="closeModal('budgetModal')">✕</button></div><label>Overall monthly budget</label><input id="overallBudgetInput" inputmode="decimal" min="0" step="1000" type="number"/><div id="budgetEdit"></div><div class="savebar"><button class="secondary" onclick="closeModal('budgetModal')">Cancel</button><button class="primary" onclick="saveBudgets()">Save</button></div></div></div>
-<div class="modal" id="debtModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="debtTitle">Add money owed</h2><button class="close" onclick="closeModal('debtModal')">✕</button></div><label>Type</label><div class="types"><button id="lendType" onclick="setDebtType('lend')">I lent money</button><button id="borrowType" onclick="setDebtType('borrow')">I borrowed</button></div><label>Person <span class="req">*</span></label><input id="dPerson"/><label>Amount <span class="req">*</span></label><input id="dAmount" inputmode="decimal" min="0" type="number"/><label>Reason / occasion</label><input id="dReason"/><label>Due date</label><input id="dDue" type="date"/><label>Reminder note</label><input id="dNote"/><div class="savebar"><button class="secondary" onclick="closeModal('debtModal')">Cancel</button><button class="primary" onclick="saveDebt()">Save</button></div></div></div>
-<div class="modal" id="repayModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>Record repayment</h2><button class="close" onclick="closeModal('repayModal')">✕</button></div><div class="card" id="repaySummary"></div><label>Amount repaid <span class="req">*</span></label><input id="repayAmount" inputmode="decimal" min="0" type="number"/><label>Date</label><input id="repayDate" type="date"/><div class="savebar"><button class="secondary" onclick="closeModal('repayModal')">Cancel</button><button class="primary" onclick="saveRepayment()">Save</button></div></div></div>
-<div class="modal" id="epfoModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2>EPFO update</h2><button class="close" onclick="closeModal('epfoModal')">✕</button></div><label>Current balance</label><input id="eBalance" inputmode="decimal" type="number"/><label>Expected monthly contribution</label><input id="eContribution" inputmode="decimal" type="number"/><label>Update date</label><input id="eDate" type="date"/><div class="savebar"><button class="secondary" onclick="closeModal('epfoModal')">Cancel</button><button class="primary" onclick="saveEpfo()">Save</button></div></div></div>
-<div class="modal" id="mfModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="mfTitle">Add mutual fund</h2><button class="close" onclick="closeModal('mfModal')">✕</button></div><label>Fund name <span class="req">*</span></label><input id="mfName"/><div class="two"><div><label>Invested</label><input id="mfInvested" inputmode="decimal" type="number"/></div><div><label>Current value <span class="req">*</span></label><input id="mfValue" inputmode="decimal" type="number"/></div></div><div class="two"><div><label>Units</label><input id="mfUnits" inputmode="decimal" step=".0001" type="number"/></div><div><label>Updated</label><input id="mfDate" type="date"/></div></div><div class="savebar"><button class="secondary" onclick="closeModal('mfModal')">Cancel</button><button class="primary" onclick="saveMf()">Save</button></div></div></div>
-<div class="modal" id="fdModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="fdTitle">Add fixed deposit</h2><button class="close" onclick="closeModal('fdModal')">✕</button></div><label>Bank <span class="req">*</span></label><input id="fdBank"/><label>Principal <span class="req">*</span></label><input id="fdPrincipal" inputmode="decimal" type="number"/><div class="two"><div><label>Interest %</label><input id="fdRate" inputmode="decimal" step=".01" type="number"/></div><div><label>Current value</label><input id="fdValue" inputmode="decimal" type="number"/></div></div><div class="two"><div><label>Start date</label><input id="fdStart" type="date"/></div><div><label>Maturity date</label><input id="fdMaturity" type="date"/></div></div><div class="savebar"><button class="secondary" onclick="closeModal('fdModal')">Cancel</button><button class="primary" onclick="saveFd()">Save</button></div></div></div>
-<div class="modal" id="stockModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="stockTitle">Add stock / ETF</h2><button class="close" onclick="closeModal('stockModal')">✕</button></div><label>Name / ticker <span class="req">*</span></label><input id="stockName" placeholder="NIFTYBEES, RELIANCE..."/><div class="two"><div><label>Quantity</label><input id="stockQty" inputmode="decimal" step=".0001" type="number"/></div><div><label>Avg. price</label><input id="stockAvg" inputmode="decimal" type="number"/></div></div><div class="two"><div><label>Current price</label><input id="stockPrice" inputmode="decimal" type="number"/></div><div><label>Current value <span class="req">*</span></label><input id="stockValue" inputmode="decimal" type="number"/></div></div><label>Updated</label><input id="stockDate" type="date"/><div class="savebar"><button class="secondary" onclick="closeModal('stockModal')">Cancel</button><button class="primary" onclick="saveStock()">Save</button></div></div></div>
-<div class="modal" id="loanModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="loanTitle">Add loan</h2><button class="close" onclick="closeModal('loanModal')">✕</button></div><label>Loan name <span class="req">*</span></label><input id="loanName" placeholder="Home Loan"/><label>Outstanding balance <span class="req">*</span></label><input id="loanOutstanding" inputmode="decimal" type="number"/><div class="two"><div><label>EMI</label><input id="loanEmi" inputmode="decimal" type="number"/></div><div><label>Interest %</label><input id="loanRate" inputmode="decimal" type="number"/></div></div><div class="two"><div><label>Tenure (months)</label><input id="loanTenure" type="number"/></div><div><label>EMIs paid</label><input id="loanPaid" type="number"/></div></div><label>Next EMI date</label><input id="loanNext" type="date"/><div class="savebar"><button class="secondary" onclick="closeModal('loanModal')">Cancel</button><button class="primary" onclick="saveLoan()">Save</button></div></div></div>
-<div class="modal" id="assetModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="assetTitle">Add other asset</h2><button class="close" onclick="closeModal('assetModal')">✕</button></div><label>Asset name <span class="req">*</span></label><input id="assetName" placeholder="Gold, property, cash..."/><label>Type</label><select id="assetType"><option>Gold</option><option>Property</option><option>Cash</option><option>Vehicle</option><option>Crypto</option><option>Business</option><option>Other</option></select><label>Current value <span class="req">*</span></label><input id="assetValue" inputmode="decimal" type="number"/><label>Updated</label><input id="assetDate" type="date"/><div class="savebar"><button class="secondary" onclick="closeModal('assetModal')">Cancel</button><button class="primary" onclick="saveAsset()">Save</button></div></div></div>
-<div class="modal" id="trendDateModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="trendDateTitle">Choose trend period</h2><button class="close" onclick="closeModal('trendDateModal')">✕</button></div><p class="small">Pick the month or year used by the trend. Rolling ranges stay based on today.</p><div class="two"><div><label>Month</label><select id="trendMonthSelect"></select></div><div><label>Year</label><select id="trendYearSelect"></select></div></div><div class="savebar"><button class="secondary" onclick="closeModal('trendDateModal')">Cancel</button><button class="primary" onclick="applyTrendDate()">Apply</button></div></div></div>
-<div class="modal" id="milestoneModal"><div class="sheet"><div class="handle"></div><div class="sheet-head"><h2 id="milestoneTitle">Add milestone</h2><button class="close" onclick="closeModal('milestoneModal')">✕</button></div>
-<label>Goal name <span class="req">*</span></label><input id="msName" placeholder="Emergency fund, ₹10L net worth..."/>
-<label>Target amount <span class="req">*</span></label><input id="msTarget" inputmode="decimal" min="0" type="number"/>
-<label>Current amount</label><input id="msCurrent" inputmode="decimal" min="0" type="number"/>
-<label>Target date</label><input id="msDate" type="date"/>
-<div class="savebar"><button class="secondary" onclick="closeModal('milestoneModal')">Cancel</button><button class="primary" onclick="saveMilestone()">Save</button></div>
-</div></div>
-<button class="install-app" id="installApp" onclick="installPwa()">＋ Install app</button><div class="modal" id="deleteModal"><div class="sheet"><div class="handle"></div>
-<div class="sheet-head"><h2>Delete entry?</h2><button class="close" onclick="closeDelete()">✕</button></div>
-<div class="small" id="deleteMessage">This entry will be removed and totals recalculated.</div>
-<div class="savebar"><button class="secondary" onclick="closeDelete()">Cancel</button><button class="primary delete-btn" onclick="confirmDelete()">Delete</button></div>
-</div></div>\n\n
-<style id="v1903-overhaul">
-:root{
- --money:#14b8a6;--money2:#22d3ee;--money-bg:#ecfdfb;
- --wealth:#7c3aed;--wealth2:#06b6d4;--wealth-bg:#f5f3ff;
- --accent:#14b8a6;
-}
-.money-page{--page-accent:#14b8a6}.wealth-page{--page-accent:#7c3aed}
-.mode button.money-active{background:linear-gradient(135deg,#14b8a6,#0ea5e9);box-shadow:0 4px 14px #14b8a644}
-.mode button.wealth-active{background:linear-gradient(135deg,#7c3aed,#06b6d4);box-shadow:0 4px 14px #7c3aed44}
-.money-page .primary,.money-page .full.primary{background:linear-gradient(135deg,#14b8a6,#0ea5e9)!important}
-.wealth-page .primary,.wealth-page .full.primary{background:linear-gradient(135deg,#7c3aed,#06b6d4)!important}
-.money-page .section h2,.money-page .global-message{color:#0f9f91}.wealth-page .section h2,.wealth-page .global-message{color:#6d36d9}
-.settings-panel{position:fixed;inset:0;background:#0b1220b8;display:none;align-items:flex-end;z-index:5000;backdrop-filter:blur(4px)}
-.settings-panel.show{display:flex}.settings-panel .sheet{width:min(800px,100%);max-height:94dvh;overflow:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:14px 18px calc(92px + env(safe-area-inset-bottom));box-shadow:0 -16px 50px #0004}
-.settings-panel .settings-list-card{margin-top:14px}.settings-panel .settings-list-card details:first-child{border-top:0}
-.settings-panel .settings-list-card{display:block!important}
-.settings-panel .wealth-setup{margin:12px 0 0}.settings-panel .wealth-setup .quick-setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
-.settings-panel .wealth-setup .quick-setting:last-child{border-bottom:0}.settings-panel .quick-setting b{font-size:15px}.settings-panel .quick-setting span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-.surprise-card{position:relative;overflow:hidden}.surprise-card .surprise-preview{font-size:15px;line-height:1.35;font-weight:760;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:82%}.surprise-card{cursor:pointer}.surprise-card .secondary{position:absolute;right:12px;top:50%;transform:translateY(-50%);min-width:72px}
-.brain-food-panel .sheet{padding-bottom:calc(70px + env(safe-area-inset-bottom))}.brain-card{padding:26px 20px;text-align:center;background:var(--surface2);border:1px solid var(--line);border-radius:22px;margin-top:14px}.brain-card .brain-icon{font-size:52px}.brain-card .brain-text{font-size:25px;line-height:1.2;font-weight:900;margin:20px 4px}.brain-card .brain-tag{font-size:11px;font-weight:850;color:var(--page-accent,var(--accent));letter-spacing:.5px;text-transform:uppercase}
-@media(max-width:560px){.settings-panel .sheet{padding-left:16px;padding-right:16px}.brain-card .brain-text{font-size:23px}}
-</style>
-<style id="v20-root-theme">
-/* V20 ROOT THEME: semantic variables only */
-:root{
-  --bg:#eef3f6;
-  --surface:#ffffff;
-  --surface2:#f6f8fa;
-  --surface3:#edf2f5;
-  --text:#172230;
-  --muted:#667586;
-  --line:#d9e1e8;
-  --money-accent:#0ea5a0;
-  --money-accent-2:#14b8a6;
-  --money-soft:#e7fbf8;
-  --money-strong:#078b84;
-  --wealth-accent:#6d5ce7;
-  --wealth-accent-2:#8b5cf6;
-  --wealth-soft:#f1edff;
-  --success:#0a9f63;
-  --danger:#d64545;
-  --warning:#d28a1c;
-  --nav-bg:rgba(255,255,255,.92);
-  --nav-border:#dbe3ea;
-  --overlay:rgba(11,18,28,.56);
-  --shadow:0 12px 34px rgba(23,34,48,.08);
-}
-body.dark{
-  --bg:#0b1018;
-  --surface:#131a25;
-  --surface2:#1a2431;
-  --surface3:#202c3a;
-  --text:#f4f7fb;
-  --muted:#9aa8b8;
-  --line:#2b394a;
-  --money-accent:#22c7bc;
-  --money-accent-2:#14b8a6;
-  --money-soft:#14312f;
-  --money-strong:#34d9cd;
-  --wealth-accent:#8c7cff;
-  --wealth-accent-2:#a78bfa;
-  --wealth-soft:#261f43;
-  --success:#33c78b;
-  --danger:#ff7b7b;
-  --warning:#f0b34f;
-  --nav-bg:rgba(15,22,32,.94);
-  --nav-border:#253244;
-  --overlay:rgba(2,6,12,.74);
-  --shadow:0 16px 42px rgba(0,0,0,.28);
-}
-body,button,input,select,textarea{color:var(--text)}
-body{background:var(--bg)!important}
-body:before{opacity:.10!important}
-.card,.quick-card,.metric,.hero-stat,.trend-card,.modal .sheet,.settings-panel .sheet,.settings-list-card,
-.action-card,.more-action,.identity-card,.surprise-card,.manage-row,.search,.filters button,.secondary,.theme,
-.mode,.mode button,.fab,nav,.sheet-head,.text-scale-row button,.navitem,.savebar button,
-select,input,textarea{border-color:var(--line)!important}
-.card,.quick-card,.metric,.trend-card,.identity-card,.surprise-card,.settings-list-card,.action-card,.more-action,
-.settings-panel .sheet,.modal .sheet{background:var(--surface)!important;box-shadow:var(--shadow)}
-input,select,textarea,.search,.filters button,.secondary,.text-scale-row button,.savebar button{background:var(--surface2)!important;color:var(--text)!important}
-button{color:var(--text)}
-.small,.brand p,.section .small,.profile-sub,.identity-sub,.more-card-head span,.surprise-preview{color:var(--muted)!important}
-body.dark .primary{color:#071319!important}
-body.dark .secondary,body.dark .theme{color:var(--text)!important;background:var(--surface2)!important}
-body.dark .close{background:var(--surface2)!important;color:var(--text)!important}
-body.dark .navitem{color:var(--muted)!important;background:transparent!important}
-body.dark .navitem.selected,body.dark .navitem.money-selected,body.dark .navitem.wealth-selected{color:#fff!important}
-body.dark .manage-row{background:transparent!important}
-body.dark .action-card,body.dark .more-action{background:var(--surface2)!important}
-.mode{background:var(--surface)!important}
-.mode button{background:transparent!important;color:var(--muted)!important}
-.mode button.money-active{background:linear-gradient(135deg,var(--money-accent),#0e8ec7)!important;color:#fff!important;box-shadow:0 8px 22px rgba(14,165,160,.28)!important}
-.mode button.wealth-active{background:linear-gradient(135deg,var(--wealth-accent),var(--wealth-accent-2))!important;color:#fff!important;box-shadow:0 8px 22px rgba(109,92,231,.28)!important}
-.money-page{--page-accent:var(--money-accent)}
-.wealth-page{--page-accent:var(--wealth-accent)}
-.money-page .primary,.money-page .fab{background:linear-gradient(135deg,var(--money-accent),#0e8ec7)!important;color:#fff!important}
-.wealth-page .primary,.wealth-page .fab{background:linear-gradient(135deg,var(--wealth-accent),var(--wealth-accent-2))!important;color:#fff!important}
-.money-page .section h2,.money-page .global-message{color:var(--money-strong)!important}
-.wealth-page .section h2,.wealth-page .global-message{color:var(--wealth-accent)!important}
-
-/* V20 Settings + More */
-.v20-more-wrap{display:grid;gap:14px}
-.v20-more-intro{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.v20-settings-btn{width:100%;min-height:54px;border:1px solid var(--line);border-radius:18px;background:var(--surface2)!important;font-weight:900;font-size:17px}
-.v20-brain-teaser{position:relative;min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(135deg,var(--surface),var(--surface2));cursor:pointer}
-.v20-brain-teaser .teaser-copy{min-width:0}.v20-brain-teaser b{font-size:17px}.v20-brain-teaser p{margin:5px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:13px;line-height:1.35}.v20-brain-dice{flex:0 0 50px;height:50px;border:1px solid var(--line);border-radius:16px;background:var(--surface2);display:grid;place-items:center;font-size:25px}
-.v20-profile-row{display:flex;align-items:center;gap:14px}.v20-profile-row .profile-avatar{width:62px;height:62px;border-radius:20px;font-size:22px}
-.v20-profile-row .profile-avatar.large{width:62px;height:62px;border-radius:20px;background-size:cover;background-position:center;flex:0 0 62px}
-.settings-panel.v20-settings-root{background:var(--overlay);backdrop-filter:blur(8px)}
-.settings-panel.v20-settings-root .sheet{background:var(--surface)!important;color:var(--text)!important}
-.v20-setting-note{color:var(--muted);font-size:12px;line-height:1.35;margin:4px 0 0}
-.v20-settings-root details{border:1px solid var(--line)!important;border-radius:18px!important;margin:10px 0!important;background:var(--surface2)!important;overflow:hidden}
-.v20-settings-root details summary{padding:16px 17px!important;font-size:16px!important;background:transparent!important}
-.v20-settings-root details[open] summary{background:var(--surface3)!important}
-.v20-settings-root .settings-body{padding:2px 16px 16px!important}
-.v20-settings-root .more-grid{gap:10px}
-.v20-settings-root .more-action{background:var(--surface)!important}
-.v20-settings-root .wealth-setup{border:1px solid var(--line)!important;border-radius:18px!important;background:var(--surface2)!important}
-
-/* V20 Brain Food global overlay */
-#brainFoodPanel.v20-brain-root{position:fixed!important;inset:0!important;background:var(--overlay)!important;z-index:7000!important;display:none!important;align-items:flex-end!important;backdrop-filter:blur(8px)}
-#brainFoodPanel.v20-brain-root.show{display:flex!important}
-#brainFoodPanel.v20-brain-root .sheet{background:var(--surface)!important;color:var(--text)!important;border-radius:28px 28px 0 0!important;max-height:92dvh;overflow:auto}
-#brainFoodPanel.v20-brain-root .brain-card{background:var(--surface2)!important;border-color:var(--line)!important}
-#brainFoodPanel.v20-brain-root .brain-tag{color:var(--page-accent,var(--money-accent))!important}
-.v20-brain-close-hint{color:var(--muted);font-size:11px;text-align:center;margin-top:9px}
-
-/* V20 bottom navigation */
-nav{background:var(--nav-bg)!important;border-top:1px solid var(--nav-border)!important;backdrop-filter:blur(16px)}
-.navinner{gap:6px!important}
-.navitem{position:relative;border:1px solid transparent!important;border-radius:16px!important;transition:transform .16s ease,background .16s ease,color .16s ease,box-shadow .16s ease!important}
-.navitem span{font-size:21px!important;line-height:1}
-.navitem.selected,.navitem.money-selected,.navitem.wealth-selected{background:var(--surface2)!important;box-shadow:inset 0 0 0 1px var(--line),0 5px 16px rgba(23,34,48,.08)!important;font-weight:900!important;transform:translateY(-2px)}
-.navitem.money-selected{color:var(--money-accent)!important}
-.navitem.wealth-selected{color:var(--wealth-accent)!important}
-
-/* V20 input and form consistency */
-input::placeholder,textarea::placeholder{color:var(--muted)!important;opacity:.9}
-select option{background:var(--surface)!important;color:var(--text)!important}
-.fab{box-shadow:0 10px 28px rgba(23,34,48,.22)!important}
-
-/* prevent stale white inline backgrounds from surviving dark theme */
-body.dark [style*="background:#fff"],body.dark [style*="background: white"],body.dark [style*="background: #fff"]{background:var(--surface)!important;color:var(--text)!important}
-body.dark [style*="color:#000"],body.dark [style*="color: #000"],body.dark [style*="color:black"]{color:var(--text)!important}
-@media(max-width:560px){.v20-brain-teaser{min-height:88px}.navitem{padding:9px 5px!important}.navitem span{font-size:20px!important}}
-</style>
-<style id="v20_2_personalization_css">
-/* V20.2 on-device Personalization Engine */
-.v202-context-note{margin-top:6px;font-size:13px;line-height:1.35;color:var(--page-accent,var(--accent));font-weight:800;min-height:18px}
-.v202-brain-card{position:relative;overflow:hidden}
-.v202-brain-visual{width:96px;height:96px;margin:4px auto 18px;border-radius:28px;display:grid;place-items:center;font-size:54px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),transparent 55%),linear-gradient(145deg,var(--surface2),var(--surface));border:1px solid var(--line);box-shadow:var(--shadow);animation:v202Float 3.8s ease-in-out infinite}
-.v202-brain-visual.small{width:58px;height:58px;border-radius:18px;font-size:30px;margin:0}
-@keyframes v202Float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}
-.v202-teaser-visual{display:flex;align-items:center;gap:10px;min-width:0}
-.v202-teaser-visual .teaser-copy{min-width:0}
-.v202-teaser-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v202-micro{font-size:11px;color:var(--muted);font-weight:700;margin-top:7px}
-body.dark .v202-brain-visual{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.10),transparent 55%),linear-gradient(145deg,var(--surface2),var(--surface))}
-</style>
-<script src="js/fun-library.js"></script><script src="js/theme-library.js"></script><script src="js/app.js"></script><script src="js/v21.js"></script></body>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+  <meta content="#18202d" name="theme-color"/>
+  <meta content="yes" name="apple-mobile-web-app-capable"/>
+  <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
+  <link href="manifest.webmanifest" rel="manifest"/>
+  <meta content="Spend Tracker V21" name="application-name"/>
+  <meta content="yes" name="mobile-web-app-capable"/>
+  <meta content="Spend Tracker" name="apple-mobile-web-app-title"/>
+  <link href="icons/icon-192.svg" rel="apple-touch-icon"/>
+  <link href="icons/icon-192.svg" rel="icon" sizes="192x192" type="image/png"/>
+  <link href="icons/icon-512.svg" rel="icon" sizes="512x512" type="image/png"/>
+  <title>
+   Spend Tracker V21
+  </title>
+  <link href="assets/styles.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="app">
+   <header class="top">
+    <div class="brand">
+     <h1 id="appTitle">
+      Abhishek's Money
+     </h1>
+     <p id="appSubtitle">
+      Your money, your rules. 💸
+     </p>
+     <div aria-live="polite" class="global-message" id="globalMessage">
+     </div>
+    </div>
+    <button aria-label="Open profile and settings" class="global-profile" id="globalProfileButton" onclick="openMore()">
+     <span class="profile-avatar global-avatar" id="globalProfileAvatar">
+      A
+     </span>
+    </button>
+   </header>
+   <div class="mode">
+    <button class="money-active" id="moneyMode" onclick="switchApp('money')">
+     Money
+    </button>
+    <button id="wealthMode" onclick="switchApp('wealth')">
+     Wealth
+    </button>
+   </div>
+   <!-- MONEY APP -->
+   <div class="app-shell money-page" id="moneyApp">
+    <section class="screen active" id="mhome">
+     <div class="hero money-hero">
+      <small>
+       Total spending
+      </small>
+      <div class="hero-total" id="mTotal">
+       ₹0
+      </div>
+      <div class="hero-grid">
+       <div class="hero-stat">
+        <span>
+         Income
+        </span>
+        <b id="mIncome">
+         ₹0
+        </b>
+       </div>
+       <div class="hero-stat">
+        <span>
+         Net balance
+        </span>
+        <b id="mBalance">
+         ₹0
+        </b>
+       </div>
+       <div class="hero-stat">
+        <span>
+         Transactions
+        </span>
+        <b id="mCount">
+         0
+        </b>
+       </div>
+      </div>
+     </div>
+     <div class="quick">
+      <div class="quick-card">
+       <b id="mToday">
+        ₹0
+       </b>
+       <span>
+        Today
+       </span>
+      </div>
+      <div class="quick-card">
+       <b id="mWeek">
+        ₹0
+       </b>
+       <span>
+        Last 7 days
+       </span>
+      </div>
+      <div class="quick-card">
+       <b id="mAvg">
+        ₹0
+       </b>
+       <span>
+        Daily avg
+       </span>
+      </div>
+      <div class="quick-card">
+       <b id="mBig">
+        ₹0
+       </b>
+       <span>
+        Biggest spend
+       </span>
+      </div>
+     </div>
+     <div class="section">
+      <div>
+       <h2>
+        Spending trend
+       </h2>
+       <span class="small" id="trendCaption">
+        Rolling period · Last 7 days
+       </span>
+      </div>
+     </div>
+     <div class="card trend-card">
+      <div class="trend-toolbar">
+       <div>
+        <b id="trendTotal">
+         ₹0
+        </b>
+        <span class="small" id="trendTotalLabel">
+         Selected period
+        </span>
+       </div>
+       <select aria-label="Spending trend period" class="trend-select" id="trendPreset" onchange="onTrendPreset(this.value)">
+       </select>
+      </div>
+      <div class="bars" id="mBars">
+      </div>
+      <div class="trend-summary" id="trendSummary">
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Recent transactions
+      </h2>
+      <button onclick="openMoneyPage('transactions')">
+       See all →
+      </button>
+     </div>
+     <div id="mRecent">
+     </div>
+    </section>
+    <section class="screen" id="mtransactions">
+     <div class="section">
+      <h2>
+       Transactions
+      </h2>
+      <span class="small">
+       Money
+      </span>
+     </div>
+     <input class="search" id="mSearch" oninput="renderMoneyTransactions()" placeholder="Search text, amount or date"/>
+     <div class="filters">
+      <button class="active" onclick="setMoneyFilter('all',this)">
+       All
+      </button>
+      <button onclick="setMoneyFilter('expense',this)">
+       Expenses
+      </button>
+      <button onclick="setMoneyFilter('income',this)">
+       Income
+      </button>
+      <button onclick="setMoneyFilter('transfer',this)">
+       Transfers
+      </button>
+     </div>
+     <div id="mTxList">
+     </div>
+    </section>
+    <section class="screen" id="manalytics">
+     <div class="section">
+      <h2>
+       Money Analytics
+      </h2>
+      <span class="small">
+       Monthly
+      </span>
+     </div>
+     <div class="card">
+      <div class="chart-head">
+       <b id="mAnTotal">
+        ₹0
+       </b>
+       <span class="small">
+        spent
+       </span>
+      </div>
+      <div id="mCats">
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Payment usage
+      </h2>
+     </div>
+     <div class="card" id="mMethods">
+     </div>
+    </section>
+    <section class="screen" id="mbudgets">
+     <div class="section">
+      <h2>
+       Goals
+      </h2>
+      <button onclick="openBudget()">
+       Edit budgets
+      </button>
+     </div>
+     <div class="card">
+      <div class="chart-head">
+       <b id="budgetSpent">
+        ₹0
+       </b>
+       <span class="small" id="budgetLabel">
+        of ₹0
+       </span>
+      </div>
+      <div class="progress" style="margin-top:10px">
+       <i id="budgetBar" style="width:0">
+       </i>
+      </div>
+      <div class="small" id="budgetText" style="margin-top:7px">
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Category budgets
+      </h2>
+     </div>
+     <div id="budgetCats">
+     </div>
+    </section>
+    <section class="screen" id="mmore">
+     <div class="settings-head">
+      <div>
+       <h2>
+        Profile &amp; Settings
+       </h2>
+       <div class="small" id="moreMessage">
+        Your financial command center. 🎛️
+       </div>
+      </div>
+     </div>
+     <div class="card identity-card">
+      <div class="identity-main">
+       <button aria-label="Change profile photo" class="avatar-button" onclick="triggerProfilePhoto()">
+        <div class="profile-avatar large" id="profileAvatar">
+         A
+        </div>
+        <span>
+         ＋
+        </span>
+       </button>
+       <div>
+        <div class="identity-name" id="profileNameLabel">
+         Abhishek
+        </div>
+        <div class="identity-sub" id="identitySub">
+         Your tracker. Your rules. ✨
+        </div>
+       </div>
+      </div>
+      <button class="primary full" onclick="openSettingsPanel()">
+       ⚙️ Settings
+      </button>
+     </div>
+     <div class="card surprise-card">
+      <div>
+       <b>
+        Today's tiny chaos
+       </b>
+       <div class="surprise-preview" id="surprisePreview">
+        🎲 Tap for something unexpected.
+       </div>
+      </div>
+      <button class="secondary" onclick="showSurpriseMessage()">
+       Roll 🎲
+      </button>
+     </div>
+     <div class="card settings-list-card">
+      <details>
+       <summary>
+        👤 Profile
+       </summary>
+       <div class="settings-body">
+        <div class="profile-fields">
+         <div class="profile-field">
+          <label>
+           Name
+          </label>
+          <input autocomplete="name" id="profileNameInput" placeholder="Your name"/>
+         </div>
+         <div class="profile-field">
+          <label>
+           Backup email
+          </label>
+          <input autocomplete="email" id="profileEmailInput" placeholder="you@example.com" type="email"/>
+         </div>
+         <div class="profile-field">
+          <label>
+           Profile photo
+          </label>
+          <input accept="image/*" id="profilePhotoInput" onchange="setProfilePhoto(this)" type="file"/>
+         </div>
+        </div>
+        <div class="profile-actions">
+         <button class="primary" onclick="saveProfile()">
+          Save profile
+         </button>
+         <button class="secondary" onclick="removeProfilePhoto()">
+          Remove photo
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🎨 Appearance &amp; text
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         Theme
+        </div>
+        <div class="savebar">
+         <button class="secondary" onclick="setThemePreference(false)">
+          ☀ Day
+         </button>
+         <button class="secondary" onclick="setThemePreference(true)">
+          ☾ Night
+         </button>
+         <button class="secondary" onclick="setThemePreference(null)">
+          Auto
+         </button>
+        </div>
+        <div class="small" style="margin-top:12px">
+         Text size
+        </div>
+        <div class="text-scale-row">
+         <button id="textSmall" onclick="setTextScale('small')">
+          Small
+         </button>
+         <button id="textNormal" onclick="setTextScale('normal')">
+          Normal
+         </button>
+         <button id="textLarge" onclick="setTextScale('large')">
+          Large
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🧩 Money categories
+       </summary>
+       <div class="settings-body">
+        <div id="mCatsManage">
+        </div>
+        <button class="link" onclick="openCategory()">
+         ＋ Add category
+        </button>
+       </div>
+      </details>
+      <details>
+       <summary>
+        💳 Payment methods
+       </summary>
+       <div class="settings-body">
+        <div id="mMethodsManage">
+        </div>
+        <button class="link" onclick="openMethod()">
+         ＋ Add payment method
+        </button>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🏦 Income accounts
+       </summary>
+       <div class="settings-body">
+        <div id="mIncomeManage">
+        </div>
+        <button class="link" onclick="openIncomeAccount()">
+         ＋ Add account
+        </button>
+       </div>
+      </details>
+      <details>
+       <summary>
+        💾 Backup &amp; transfer
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         One portable JSON backup. No cloud API, no silent uploads.
+        </div>
+        <div class="more-grid" style="margin-top:10px">
+         <button class="more-action" onclick="backupData()">
+          ⬇ Backup
+          <span>
+           Update your backup file
+          </span>
+         </button>
+         <button class="more-action" onclick="importData()">
+          ⬆ Restore
+          <span>
+           Replace current data
+          </span>
+         </button>
+         <button class="more-action" onclick="mergeData()">
+          ＋ Merge
+          <span>
+           Combine records
+          </span>
+         </button>
+         <button class="more-action" onclick="exportCSV()">
+          ▤ CSV
+          <span>
+           Money transactions
+          </span>
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🧠 Personalization
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         The app adapts messages and headers using your current screen, mode, time and financial state.
+        </div>
+        <div class="personal-options">
+         <label>
+          <input checked="" id="personalEnabled" onchange="setPersonalization('enabled',this.checked)" type="checkbox"/>
+          Personalized experience
+         </label>
+         <label>
+          <input checked="" id="personalFunny" onchange="setPersonalization('funny',this.checked)" type="checkbox"/>
+          Funny / sarcastic lines
+         </label>
+         <label>
+          <input checked="" id="personalFacts" onchange="setPersonalization('facts',this.checked)" type="checkbox"/>
+          Finance facts
+         </label>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🧨 Reset app data
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         Deletes local Money + Wealth data. Backup first unless chaos is the goal.
+        </div>
+        <button class="secondary danger-wide" onclick="resetProfile()">
+         Reset all data
+        </button>
+       </div>
+      </details>
+     </div>
+    </section>
+   </div>
+   <!-- WEALTH APP -->
+   <div class="app-shell wealth-page" id="wealthApp" style="display:none">
+    <section class="screen active" id="whome">
+     <div class="wealth-hero">
+      <small>
+       Total net worth
+      </small>
+      <div class="worth" id="wNetWorth">
+       ₹0
+      </div>
+      <div class="wealth-delta" id="wDelta">
+       Assets − liabilities + receivable − payable
+      </div>
+     </div>
+     <div class="metric-grid">
+      <div class="metric">
+       <span class="small">
+        Assets
+       </span>
+       <b id="wAssets">
+        ₹0
+       </b>
+      </div>
+      <div class="metric">
+       <span class="small">
+        Liabilities
+       </span>
+       <b id="wLiab">
+        ₹0
+       </b>
+      </div>
+      <div class="metric">
+       <span class="small">
+        Owed to you
+       </span>
+       <b id="wLend">
+        ₹0
+       </b>
+      </div>
+      <div class="metric">
+       <span class="small">
+        You owe
+       </span>
+       <b id="wBorrow">
+        ₹0
+       </b>
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Wealth mix
+      </h2>
+      <span class="small">
+       Current
+      </span>
+     </div>
+     <div class="card">
+      <div class="mix" id="wMix">
+      </div>
+      <div class="legend" id="wLegend">
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Assets
+      </h2>
+      <button onclick="openWealthPage('networth')">
+       Manage →
+      </button>
+     </div>
+     <div id="wAssetPreview">
+     </div>
+     <div class="section">
+      <h2>
+       Liabilities
+      </h2>
+      <button onclick="openWealthPage('networth')">
+       Manage →
+      </button>
+     </div>
+     <div id="wLiabPreview">
+     </div>
+     <div class="section">
+      <h2>
+       Money owed
+      </h2>
+      <button onclick="openWealthPage('debts')">
+       Open →
+      </button>
+     </div>
+     <div id="wDebtPreview">
+     </div>
+     <div class="section">
+      <h2>
+       Milestones
+      </h2>
+      <button onclick="openMore()">
+       Manage →
+      </button>
+     </div>
+     <div id="wMilestonePreview">
+     </div>
+    </section>
+    <section class="screen" id="wnetworth">
+     <div class="section">
+      <h2>
+       Net Worth
+      </h2>
+      <span class="small">
+       Wealth records
+      </span>
+     </div>
+     <div class="wealth-hero">
+      <small>
+       Current net worth
+      </small>
+      <div class="worth" id="nwTotal">
+       ₹0
+      </div>
+      <div class="wealth-delta">
+       All wealth records combined.
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Fixed Deposits
+      </h2>
+      <button onclick="openFd()">
+       + Add
+      </button>
+     </div>
+     <div id="fdList">
+     </div>
+     <div class="section">
+      <h2>
+       Mutual Funds
+      </h2>
+      <button onclick="openMf()">
+       + Add
+      </button>
+     </div>
+     <div id="mfList">
+     </div>
+     <div class="section">
+      <h2>
+       Stocks / ETFs
+      </h2>
+      <button onclick="openStock()">
+       + Add
+      </button>
+     </div>
+     <div id="stockList">
+     </div>
+     <div class="section">
+      <h2>
+       EPFO
+      </h2>
+      <button onclick="openEpfo()">
+       Edit
+      </button>
+     </div>
+     <div class="card" id="epfoCard">
+     </div>
+     <div class="section">
+      <h2>
+       Loans
+      </h2>
+      <button onclick="openLoan()">
+       + Add
+      </button>
+     </div>
+     <div id="loanList">
+     </div>
+     <div class="section">
+      <h2>
+       Other Assets
+      </h2>
+      <button onclick="openAsset()">
+       + Add
+      </button>
+     </div>
+     <div id="otherAssetList">
+     </div>
+     <div class="section">
+      <h2>
+       Net worth history
+      </h2>
+     </div>
+     <div class="card" id="worthHistory">
+     </div>
+    </section>
+    <section class="screen" id="wtransactions">
+     <div class="section">
+      <h2>
+       Wealth activity
+      </h2>
+      <span class="small">
+       Not Money transactions
+      </span>
+     </div>
+     <div class="card">
+      <div id="wealthActivity">
+      </div>
+     </div>
+    </section>
+    <section class="screen wealth-analytics-screen" id="wanalytics">
+     <div class="section">
+      <div>
+       <h2>
+        Wealth Analytics
+       </h2>
+       <span class="small">
+        A clean view of where your wealth sits
+       </span>
+      </div>
+      <span class="wealth-pill">
+       LIVE
+      </span>
+     </div>
+     <div class="wealth-kpi-card">
+      <div class="wealth-kpi-label">
+       Total net worth
+      </div>
+      <div class="wealth-kpi-value" id="waNet">
+       ₹0
+      </div>
+      <div class="wealth-kpi-note">
+       Assets minus liabilities, adjusted for money owed
+      </div>
+     </div>
+     <div class="wealth-stat-grid">
+      <div class="wealth-stat">
+       <span>
+        Assets
+       </span>
+       <b id="waAssets">
+        ₹0
+       </b>
+       <i>
+       </i>
+      </div>
+      <div class="wealth-stat">
+       <span>
+        Liabilities
+       </span>
+       <b id="waLiab">
+        ₹0
+       </b>
+       <i>
+       </i>
+      </div>
+      <div class="wealth-stat">
+       <span>
+        Owed to you
+       </span>
+       <b id="waLend">
+        ₹0
+       </b>
+       <i>
+       </i>
+      </div>
+      <div class="wealth-stat">
+       <span>
+        You owe
+       </span>
+       <b id="waBorrow">
+        ₹0
+       </b>
+       <i>
+       </i>
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Where your wealth is
+      </h2>
+      <span class="small">
+       Current value
+      </span>
+     </div>
+     <div class="wealth-allocation-card">
+      <div class="wealth-allocation-head">
+       <span>
+        Allocation
+       </span>
+       <b id="waAllocTotal">
+        ₹0
+       </b>
+      </div>
+      <div id="waAlloc">
+      </div>
+     </div>
+     <div class="section">
+      <h2>
+       Balance breakdown
+      </h2>
+     </div>
+     <div class="wealth-breakdown-card" id="waBreak">
+     </div>
+    </section>
+    <section class="screen" id="wdebts">
+     <div class="section">
+      <div>
+       <h2>
+        Money owed
+       </h2>
+       <span class="small">
+        Receivable and payable balances
+       </span>
+      </div>
+      <button class="wealth-link" onclick="openDebt()">
+       + Add
+      </button>
+     </div>
+     <div class="wealth-dashboard-card">
+      <div class="goal-kpi">
+       <span>
+        Owed to you
+       </span>
+       <b id="wdLend">
+        ₹0
+       </b>
+      </div>
+      <div class="goal-kpi">
+       <span>
+        You owe
+       </span>
+       <b id="wdBorrow">
+        ₹0
+       </b>
+      </div>
+     </div>
+     <div id="debtList">
+     </div>
+    </section>
+    <section class="screen" id="wbudgets">
+     <div class="section">
+      <div>
+       <h2>
+        Wealth milestones
+       </h2>
+       <span class="small">
+        Goals, progress and target dates
+       </span>
+      </div>
+      <button class="wealth-link" onclick="openMilestone()">
+       + Add
+      </button>
+     </div>
+     <div class="wealth-dashboard-card">
+      <div class="goal-kpi">
+       <span>
+        Active goals
+       </span>
+       <b id="wGoalCount">
+        0
+       </b>
+      </div>
+      <div class="goal-kpi">
+       <span>
+        Overall progress
+       </span>
+       <b id="wGoalProgress">
+        0%
+       </b>
+      </div>
+     </div>
+     <div id="wealthBudgetMilestones">
+     </div>
+    </section>
+    <section class="screen" id="wmore">
+     <div class="settings-head">
+      <div>
+       <h2>
+        Profile &amp; Settings
+       </h2>
+       <div class="small" id="wealthMoreMessage">
+        Your wealth corner. 📈
+       </div>
+      </div>
+     </div>
+     <div class="card identity-card">
+      <div class="identity-main">
+       <button aria-label="Change profile photo" class="avatar-button" onclick="triggerProfilePhoto()">
+        <div class="profile-avatar large" id="wealthProfileAvatar">
+         A
+        </div>
+        <span>
+         ＋
+        </span>
+       </button>
+       <div>
+        <div class="identity-name" id="wealthProfileNameLabel">
+         Abhishek
+        </div>
+        <div class="identity-sub">
+         Building future-you money. 🧠
+        </div>
+       </div>
+      </div>
+      <button class="primary full" onclick="openSettingsPanel()">
+       ⚙️ Settings
+      </button>
+     </div>
+     <div class="card surprise-card">
+      <div>
+       <b>
+        Wealth thought
+       </b>
+       <div class="surprise-preview" id="wealthSurprisePreview">
+        🎲 Tap for something unexpected.
+       </div>
+      </div>
+      <button class="secondary" onclick="showSurpriseMessage()">
+       Roll 🎲
+      </button>
+     </div>
+     <div class="card settings-list-card">
+      <details>
+       <summary>
+        👤 Profile
+       </summary>
+       <div class="settings-body">
+        <div class="profile-fields">
+         <div class="profile-field">
+          <label>
+           Name
+          </label>
+          <input autocomplete="name" id="wealthProfileNameInput" placeholder="Your name"/>
+         </div>
+         <div class="profile-field">
+          <label>
+           Backup email
+          </label>
+          <input autocomplete="email" id="wealthProfileEmailInput" placeholder="you@example.com" type="email"/>
+         </div>
+         <div class="profile-field">
+          <label>
+           Profile photo
+          </label>
+          <input accept="image/*" id="wealthProfilePhotoInput" onchange="setProfilePhoto(this)" type="file"/>
+         </div>
+        </div>
+        <div class="profile-actions">
+         <button class="primary" onclick="saveProfile()">
+          Save profile
+         </button>
+         <button class="secondary" onclick="removeProfilePhoto()">
+          Remove photo
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🎨 Appearance &amp; text
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         Theme
+        </div>
+        <div class="savebar">
+         <button class="secondary" onclick="setThemePreference(false)">
+          ☀ Day
+         </button>
+         <button class="secondary" onclick="setThemePreference(true)">
+          ☾ Night
+         </button>
+         <button class="secondary" onclick="setThemePreference(null)">
+          Auto
+         </button>
+        </div>
+        <div class="small" style="margin-top:12px">
+         Text size
+        </div>
+        <div class="text-scale-row">
+         <button id="wealthTextSmall" onclick="setTextScale('small')">
+          Small
+         </button>
+         <button id="wealthTextNormal" onclick="setTextScale('normal')">
+          Normal
+         </button>
+         <button id="wealthTextLarge" onclick="setTextScale('large')">
+          Large
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        💾 Backup &amp; transfer
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         One portable JSON backup. No cloud API, no silent uploads.
+        </div>
+        <div class="more-grid" style="margin-top:10px">
+         <button class="more-action" onclick="backupData()">
+          ⬇ Backup
+          <span>
+           Update your backup file
+          </span>
+         </button>
+         <button class="more-action" onclick="importData()">
+          ⬆ Restore
+          <span>
+           Replace current data
+          </span>
+         </button>
+         <button class="more-action" onclick="mergeData()">
+          ＋ Merge
+          <span>
+           Combine records
+          </span>
+         </button>
+         <button class="more-action" onclick="exportCSV()">
+          ▤ CSV
+          <span>
+           Money transactions
+          </span>
+         </button>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🧠 Personalization
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         Adaptive headers and messages use your current mode, screen, time and financial state.
+        </div>
+        <div class="personal-options">
+         <label>
+          <input checked="" id="wealthPersonalEnabled" onchange="setPersonalization('enabled',this.checked)" type="checkbox"/>
+          Personalized experience
+         </label>
+         <label>
+          <input checked="" id="wealthPersonalFunny" onchange="setPersonalization('funny',this.checked)" type="checkbox"/>
+          Funny / sarcastic lines
+         </label>
+         <label>
+          <input checked="" id="wealthPersonalFacts" onchange="setPersonalization('facts',this.checked)" type="checkbox"/>
+          Finance facts
+         </label>
+        </div>
+       </div>
+      </details>
+      <details>
+       <summary>
+        🧨 Reset app data
+       </summary>
+       <div class="settings-body">
+        <div class="small">
+         Deletes local Money + Wealth data. Backup first unless chaos is the goal.
+        </div>
+        <button class="secondary danger-wide" onclick="resetProfile()">
+         Reset all data
+        </button>
+       </div>
+      </details>
+     </div>
+     <div class="card wealth-milestone-card" style="margin-top:12px">
+      <div class="section" style="margin:0 0 6px">
+       <div>
+        <h2 style="font-size:16px">
+         Milestones
+        </h2>
+        <div class="small">
+         Targets you want to reach
+        </div>
+       </div>
+       <button onclick="openMilestone()">
+        + Add
+       </button>
+      </div>
+      <div id="wealthMilestones">
+      </div>
+     </div>
+    </section>
+   </div>
+  </div>
+  <button class="fab" id="fab" onclick="contextAdd()">
+   +
+  </button>
+  <nav>
+   <div class="navinner">
+    <button class="navitem money-selected" data-section="home" id="navHome" onclick="navigate('home')">
+     <span>
+      ⌂
+     </span>
+     Home
+    </button>
+    <button class="navitem" data-section="transactions" id="navTx" onclick="navigate('transactions')">
+     <span>
+      ≡
+     </span>
+     Transactions
+    </button>
+    <button class="navitem" data-section="analytics" id="navAnalytics" onclick="navigate('analytics')">
+     <span>
+      ◔
+     </span>
+     Analytics
+    </button>
+    <button class="navitem" data-section="budgets" id="navBudget" onclick="navigate('budgets')">
+     <span>
+      ◎
+     </span>
+     Goals
+    </button>
+   </div>
+  </nav>
+  <!-- All modals -->
+  <div class="modal" id="actionModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="actionTitle">
+      Add transaction
+     </h2>
+     <button class="close" onclick="closeModal('actionModal')">
+      ✕
+     </button>
+    </div>
+    <p class="small" id="actionSub">
+    </p>
+    <div class="action-grid" id="moneyActions">
+     <button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'expense')">
+      💸
+      <b>
+       Expense
+      </b>
+      <span>
+       Record spending
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'income')">
+      💰
+      <b>
+       Income
+      </b>
+      <span>
+       Salary, bonus, gift
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openTransaction(null,'transfer')">
+      🤝
+      <b>
+       Personal transfer
+      </b>
+      <span>
+       Send money to someone
+      </span>
+     </button>
+    </div>
+    <div class="action-grid" id="wealthActions" style="display:none">
+     <button class="action-card" onclick="closeModal('actionModal');openFd()">
+      🏧
+      <b>
+       Fixed Deposit
+      </b>
+      <span>
+       Book or update FD
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openMf()">
+      📈
+      <b>
+       Mutual Fund
+      </b>
+      <span>
+       Track current value
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openDebt()">
+      🤝
+      <b>
+       Money Owed
+      </b>
+      <span>
+       Lent or borrowed
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openEpfo()">
+      🏢
+      <b>
+       EPFO
+      </b>
+      <span>
+       Update or correct balance
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openLoan()">
+      🏦
+      <b>
+       Loan
+      </b>
+      <span>
+       Balance and EMI
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openStock()">
+      📊
+      <b>
+       Stocks / ETFs
+      </b>
+      <span>
+       Track holdings
+      </span>
+     </button>
+     <button class="action-card" onclick="closeModal('actionModal');openAsset()">
+      🏠
+      <b>
+       Other asset
+      </b>
+      <span>
+       Gold, property, etc.
+      </span>
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="txModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="txTitle">
+      Add transaction
+     </h2>
+     <button class="close" onclick="closeModal('txModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Type
+    </label>
+    <div class="types">
+     <button id="te" onclick="setTxType('expense')">
+      Expense
+     </button>
+     <button id="ti" onclick="setTxType('income')">
+      Income
+     </button>
+     <button id="tt" onclick="setTxType('transfer')">
+      Personal transfer
+     </button>
+    </div>
+    <div id="normalFields">
+     <label>
+      Amount
+      <span class="req">
+       *
+      </span>
+     </label>
+     <input id="fAmount" inputmode="decimal" min="0" step=".01" type="number"/>
+     <label>
+      Category
+      <span class="req">
+       *
+      </span>
+     </label>
+     <select id="fCat">
+     </select>
+     <label id="methodLabel">
+      Payment method
+      <span class="req">
+       *
+      </span>
+     </label>
+     <select id="fMethod">
+     </select>
+     <label id="accountLabel" style="display:none">
+      Credited account
+     </label>
+     <select id="fAccount" style="display:none">
+     </select>
+     <label>
+      Date
+     </label>
+     <input id="fDate" type="date"/>
+     <label>
+      Description
+      <span class="small">
+       (optional)
+      </span>
+     </label>
+     <input id="fDesc"/>
+    </div>
+    <div id="transferFields" style="display:none">
+     <label>
+      Amount
+      <span class="req">
+       *
+      </span>
+     </label>
+     <input id="tAmount" inputmode="decimal" min="0" type="number"/>
+     <label>
+      To whom
+      <span class="req">
+       *
+      </span>
+     </label>
+     <input id="tPerson"/>
+     <label>
+      Occasion / purpose
+     </label>
+     <input id="tOccasion"/>
+     <label>
+      Payment method
+      <span class="req">
+       *
+      </span>
+     </label>
+     <select id="tMethod">
+     </select>
+     <label>
+      Date
+     </label>
+     <input id="tDate" type="date"/>
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('txModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveTransaction()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="txActionModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="txActionTitle">
+      Transaction
+     </h2>
+     <button class="close" onclick="closeModal('txActionModal')">
+      ✕
+     </button>
+    </div>
+    <div class="small" id="txActionMeta">
+    </div>
+    <div class="tx-action-list">
+     <button onclick="editSelectedTransaction()">
+      ✏️ Edit transaction
+     </button>
+     <button class="danger" onclick="deleteSelectedTransaction()">
+      🗑️ Delete transaction
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="categoryModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="catTitle">
+      Add category
+     </h2>
+     <button class="close" onclick="closeModal('categoryModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Name
+    </label>
+    <input id="catName"/>
+    <label>
+     Icon
+    </label>
+    <input id="catIcon" maxlength="2" placeholder="✈️"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('categoryModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveCategory()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="methodModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="methodTitle">
+      Add payment method
+     </h2>
+     <button class="close" onclick="closeModal('methodModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Name
+    </label>
+    <input id="methodName"/>
+    <label>
+     Type
+    </label>
+    <select id="methodType">
+     <option>
+      Bank account
+     </option>
+     <option>
+      Credit card
+     </option>
+     <option>
+      Debit card
+     </option>
+     <option>
+      Cash
+     </option>
+     <option>
+      UPI
+     </option>
+     <option>
+      Wallet
+     </option>
+     <option>
+      Other
+     </option>
+    </select>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('methodModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveMethod()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="incomeModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2>
+      Income account
+     </h2>
+     <button class="close" onclick="closeModal('incomeModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Account name
+    </label>
+    <input id="incomeName"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('incomeModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveIncomeAccount()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="budgetModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2>
+      Budgets
+     </h2>
+     <button class="close" onclick="closeModal('budgetModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Overall monthly budget
+    </label>
+    <input id="overallBudgetInput" inputmode="decimal" min="0" step="1000" type="number"/>
+    <div id="budgetEdit">
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('budgetModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveBudgets()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="debtModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="debtTitle">
+      Add money owed
+     </h2>
+     <button class="close" onclick="closeModal('debtModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Type
+    </label>
+    <div class="types">
+     <button id="lendType" onclick="setDebtType('lend')">
+      I lent money
+     </button>
+     <button id="borrowType" onclick="setDebtType('borrow')">
+      I borrowed
+     </button>
+    </div>
+    <label>
+     Person
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="dPerson"/>
+    <label>
+     Amount
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="dAmount" inputmode="decimal" min="0" type="number"/>
+    <label>
+     Reason / occasion
+    </label>
+    <input id="dReason"/>
+    <label>
+     Due date
+    </label>
+    <input id="dDue" type="date"/>
+    <label>
+     Reminder note
+    </label>
+    <input id="dNote"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('debtModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveDebt()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="repayModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2>
+      Record repayment
+     </h2>
+     <button class="close" onclick="closeModal('repayModal')">
+      ✕
+     </button>
+    </div>
+    <div class="card" id="repaySummary">
+    </div>
+    <label>
+     Amount repaid
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="repayAmount" inputmode="decimal" min="0" type="number"/>
+    <label>
+     Date
+    </label>
+    <input id="repayDate" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('repayModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveRepayment()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="epfoModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2>
+      EPFO update
+     </h2>
+     <button class="close" onclick="closeModal('epfoModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Current balance
+    </label>
+    <input id="eBalance" inputmode="decimal" type="number"/>
+    <label>
+     Expected monthly contribution
+    </label>
+    <input id="eContribution" inputmode="decimal" type="number"/>
+    <label>
+     Update date
+    </label>
+    <input id="eDate" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('epfoModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveEpfo()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="mfModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="mfTitle">
+      Add mutual fund
+     </h2>
+     <button class="close" onclick="closeModal('mfModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Fund name
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="mfName"/>
+    <div class="two">
+     <div>
+      <label>
+       Invested
+      </label>
+      <input id="mfInvested" inputmode="decimal" type="number"/>
+     </div>
+     <div>
+      <label>
+       Current value
+       <span class="req">
+        *
+       </span>
+      </label>
+      <input id="mfValue" inputmode="decimal" type="number"/>
+     </div>
+    </div>
+    <div class="two">
+     <div>
+      <label>
+       Units
+      </label>
+      <input id="mfUnits" inputmode="decimal" step=".0001" type="number"/>
+     </div>
+     <div>
+      <label>
+       Updated
+      </label>
+      <input id="mfDate" type="date"/>
+     </div>
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('mfModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveMf()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="fdModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="fdTitle">
+      Add fixed deposit
+     </h2>
+     <button class="close" onclick="closeModal('fdModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Bank
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="fdBank"/>
+    <label>
+     Principal
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="fdPrincipal" inputmode="decimal" type="number"/>
+    <div class="two">
+     <div>
+      <label>
+       Interest %
+      </label>
+      <input id="fdRate" inputmode="decimal" step=".01" type="number"/>
+     </div>
+     <div>
+      <label>
+       Current value
+      </label>
+      <input id="fdValue" inputmode="decimal" type="number"/>
+     </div>
+    </div>
+    <div class="two">
+     <div>
+      <label>
+       Start date
+      </label>
+      <input id="fdStart" type="date"/>
+     </div>
+     <div>
+      <label>
+       Maturity date
+      </label>
+      <input id="fdMaturity" type="date"/>
+     </div>
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('fdModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveFd()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="stockModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="stockTitle">
+      Add stock / ETF
+     </h2>
+     <button class="close" onclick="closeModal('stockModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Name / ticker
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="stockName" placeholder="NIFTYBEES, RELIANCE..."/>
+    <div class="two">
+     <div>
+      <label>
+       Quantity
+      </label>
+      <input id="stockQty" inputmode="decimal" step=".0001" type="number"/>
+     </div>
+     <div>
+      <label>
+       Avg. price
+      </label>
+      <input id="stockAvg" inputmode="decimal" type="number"/>
+     </div>
+    </div>
+    <div class="two">
+     <div>
+      <label>
+       Current price
+      </label>
+      <input id="stockPrice" inputmode="decimal" type="number"/>
+     </div>
+     <div>
+      <label>
+       Current value
+       <span class="req">
+        *
+       </span>
+      </label>
+      <input id="stockValue" inputmode="decimal" type="number"/>
+     </div>
+    </div>
+    <label>
+     Updated
+    </label>
+    <input id="stockDate" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('stockModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveStock()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="loanModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="loanTitle">
+      Add loan
+     </h2>
+     <button class="close" onclick="closeModal('loanModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Loan name
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="loanName" placeholder="Home Loan"/>
+    <label>
+     Outstanding balance
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="loanOutstanding" inputmode="decimal" type="number"/>
+    <div class="two">
+     <div>
+      <label>
+       EMI
+      </label>
+      <input id="loanEmi" inputmode="decimal" type="number"/>
+     </div>
+     <div>
+      <label>
+       Interest %
+      </label>
+      <input id="loanRate" inputmode="decimal" type="number"/>
+     </div>
+    </div>
+    <div class="two">
+     <div>
+      <label>
+       Tenure (months)
+      </label>
+      <input id="loanTenure" type="number"/>
+     </div>
+     <div>
+      <label>
+       EMIs paid
+      </label>
+      <input id="loanPaid" type="number"/>
+     </div>
+    </div>
+    <label>
+     Next EMI date
+    </label>
+    <input id="loanNext" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('loanModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveLoan()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="assetModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="assetTitle">
+      Add other asset
+     </h2>
+     <button class="close" onclick="closeModal('assetModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Asset name
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="assetName" placeholder="Gold, property, cash..."/>
+    <label>
+     Type
+    </label>
+    <select id="assetType">
+     <option>
+      Gold
+     </option>
+     <option>
+      Property
+     </option>
+     <option>
+      Cash
+     </option>
+     <option>
+      Vehicle
+     </option>
+     <option>
+      Crypto
+     </option>
+     <option>
+      Business
+     </option>
+     <option>
+      Other
+     </option>
+    </select>
+    <label>
+     Current value
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="assetValue" inputmode="decimal" type="number"/>
+    <label>
+     Updated
+    </label>
+    <input id="assetDate" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('assetModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveAsset()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="trendDateModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="trendDateTitle">
+      Choose trend period
+     </h2>
+     <button class="close" onclick="closeModal('trendDateModal')">
+      ✕
+     </button>
+    </div>
+    <p class="small">
+     Pick the month or year used by the trend. Rolling ranges stay based on today.
+    </p>
+    <div class="two">
+     <div>
+      <label>
+       Month
+      </label>
+      <select id="trendMonthSelect">
+      </select>
+     </div>
+     <div>
+      <label>
+       Year
+      </label>
+      <select id="trendYearSelect">
+      </select>
+     </div>
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('trendDateModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="applyTrendDate()">
+      Apply
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="modal" id="milestoneModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2 id="milestoneTitle">
+      Add milestone
+     </h2>
+     <button class="close" onclick="closeModal('milestoneModal')">
+      ✕
+     </button>
+    </div>
+    <label>
+     Goal name
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="msName" placeholder="Emergency fund, ₹10L net worth..."/>
+    <label>
+     Target amount
+     <span class="req">
+      *
+     </span>
+    </label>
+    <input id="msTarget" inputmode="decimal" min="0" type="number"/>
+    <label>
+     Current amount
+    </label>
+    <input id="msCurrent" inputmode="decimal" min="0" type="number"/>
+    <label>
+     Target date
+    </label>
+    <input id="msDate" type="date"/>
+    <div class="savebar">
+     <button class="secondary" onclick="closeModal('milestoneModal')">
+      Cancel
+     </button>
+     <button class="primary" onclick="saveMilestone()">
+      Save
+     </button>
+    </div>
+   </div>
+  </div>
+  <button class="install-app" id="installApp" onclick="installPwa()">
+   ＋ Install app
+  </button>
+  <div class="modal" id="deleteModal">
+   <div class="sheet">
+    <div class="handle">
+    </div>
+    <div class="sheet-head">
+     <h2>
+      Delete entry?
+     </h2>
+     <button class="close" onclick="closeDelete()">
+      ✕
+     </button>
+    </div>
+    <div class="small" id="deleteMessage">
+     This entry will be removed and totals recalculated.
+    </div>
+    <div class="savebar">
+     <button class="secondary" onclick="closeDelete()">
+      Cancel
+     </button>
+     <button class="primary delete-btn" onclick="confirmDelete()">
+      Delete
+     </button>
+    </div>
+   </div>
+  </div>
+  \n
+  \n
+ <script src="assets/app-legacy.js"></script>
+<script src="src/features/fun-library.js"></script>
+<script src="assets/v21.js"></script>
+</body>
 </html>
