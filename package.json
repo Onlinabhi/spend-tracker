@@ -1,17 +1,19 @@
 {
-  "name": "spend-tracker-v20-2",
-  "version": "20.2.0",
+  "name": "spend-tracker",
+  "version": "24.1.0",
   "private": true,
   "scripts": {
     "build": "echo No web build required",
     "cap:add": "npx cap add android",
-    "cap:sync": "npx cap sync android"
+    "cap:sync": "npx cap sync android",
+    "icons": "npx @capacitor/assets generate --android"
   },
   "dependencies": {
     "@capacitor/core": "^7.4.3",
     "@capacitor/android": "^7.4.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/assets": "^3.0.5"
   }
 }
