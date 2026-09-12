@@ -28,14 +28,16 @@ jobs:
           cp index.html www/
           cp manifest.webmanifest www/
           cp sw.js www/
-          cp icon-192.svg www/
-          cp icon-512.svg www/
+          cp -r icon www/
 
       - name: Check Capacitor
         run: npx cap --version
 
       - name: Create Android project
         run: npx cap add android
+
+      - name: Generate Android app icons
+        run: npx @capacitor/assets generate --android --iconBackgroundColor '#062118'
 
       - name: Sync web app
         run: npx cap sync android
@@ -55,5 +57,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: spend-tracker-v20-2
+          name: spend-tracker-v24
           path: android/app/build/outputs/apk/debug/app-debug.apk
